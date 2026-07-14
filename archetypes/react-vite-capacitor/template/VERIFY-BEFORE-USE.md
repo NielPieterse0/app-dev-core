@@ -9,9 +9,11 @@ This archetype is a harvested Stage 1 seed, not a fully proven generated product
 - The six capability ports and web adapters.
 - Browser Supabase env and PKCE client guards harvested from Signal.
 - Product-side workflow guidance, initial spec seed, and local OM reference.
+- Product-side permissions remain owned by `.codex/config.toml`, and docs point there.
 - Core-side generation restores product-owned workflow and migration paths.
 - Core clean-room verification already proved `npm ci` and `npm run verify` on a generated repo.
 - `npm run verify` now covers structure, whole-tree secret scan, tests, build, and browser E2E.
+- `npm run release:check` now verifies branch protection, workflow permissions, secret scanning, and deviation-expiry dates.
 
 ## Still to prove in a generated product
 

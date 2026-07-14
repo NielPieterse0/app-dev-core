@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import {
   evaluateBranchProtection,
   evaluateDependabotConfig,
+  evaluateDeviationExpiries,
   evaluateHostedChecks,
   evaluateSecurityAnalysis,
   evaluateWorkflowPermissions,
@@ -33,6 +34,9 @@ results.push(
 
 const envExample = existsSync(".env.example") ? readFileSync(".env.example", "utf8") : "";
 const hasBackend = /SUPABASE|API_URL|DATABASE/i.test(envExample);
+const manifest = existsSync("app-dev.manifest.json")
+  ? JSON.parse(readFileSync("app-dev.manifest.json", "utf8"))
+  : {};
 
 results.push(
   hasBackend
@@ -44,6 +48,8 @@ results.push(
       }
     : { rule: "R17", state: "not-applicable", detail: "No backend configured yet." }
 );
+
+results.push(evaluateDeviationExpiries(manifest));
 
 function ghResult(): { rule: string; state: State; detail?: string } {
   const auth = spawnSync("gh", ["auth", "status"], { encoding: "utf8" });

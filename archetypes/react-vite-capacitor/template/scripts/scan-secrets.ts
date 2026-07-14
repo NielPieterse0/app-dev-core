@@ -29,6 +29,9 @@ const secretPatterns: { label: string; pattern: RegExp }[] = [
   { label: "OpenAI API key", pattern: /\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b/ },
   { label: "GitHub token", pattern: /\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/ },
   { label: "Supabase secret key", pattern: /\bsb_secret_[A-Za-z0-9]{20,}\b/ },
+  { label: "AWS access key", pattern: /\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/ },
+  { label: "Stripe secret key", pattern: /\bsk_(?:live|test)_[A-Za-z0-9]{16,}\b/ },
+  { label: "Slack token", pattern: /\bxox[baprs]-[A-Za-z0-9-]{12,}\b/ },
   { label: "Private key block", pattern: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----/ },
 ];
 

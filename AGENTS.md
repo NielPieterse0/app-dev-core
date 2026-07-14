@@ -1,5 +1,4 @@
 # app-dev-core
-
 Reusable development method: archetypes, generator, schemas, enforcement.
 No product source. No product migrations.
 

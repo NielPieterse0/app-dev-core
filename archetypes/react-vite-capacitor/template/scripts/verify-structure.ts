@@ -85,6 +85,23 @@ const read = (filePath: string) => {
   }
 };
 
+function parseCodexProfile(config: string) {
+  const defaultProfile = config.match(/^\s*default_permissions\s*=\s*"([^"]+)"/m)?.[1];
+  if (!defaultProfile) {
+    return { ok: false, detail: "default_permissions is not set in .codex/config.toml" };
+  }
+
+  if (defaultProfile.startsWith(":")) {
+    return { ok: true };
+  }
+
+  const escapedProfile = defaultProfile.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const declared = new RegExp(`\\[permissions\\.${escapedProfile}\\b`).test(config);
+  return declared
+    ? { ok: true }
+    : { ok: false, detail: `Profile "${defaultProfile}" is missing its [permissions.${defaultProfile}] table.` };
+}
+
 const stripComments = (source: string) =>
   source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 
@@ -186,6 +203,23 @@ results.push(
   absolutePathHits.length
     ? { rule: "R12", state: "failed", detail: absolutePathHits.join(", ") }
     : { rule: "R12", state: "passed" }
+);
+
+const codexConfig = read(".codex/config.toml");
+const permissionsDocs = `${read("AGENTS.md")}\n${read("README.md")}\n${read("VERIFY-BEFORE-USE.md")}`;
+const profileCheck = parseCodexProfile(codexConfig);
+const referencesPermissionsOwner = /\.codex\/config\.toml/.test(permissionsDocs) && /permission/i.test(permissionsDocs);
+
+results.push(
+  !profileCheck.ok
+    ? { rule: "R22", state: "failed", detail: profileCheck.detail }
+    : !referencesPermissionsOwner
+      ? {
+          rule: "R22",
+          state: "failed",
+          detail: "Docs must point to .codex/config.toml as the permissions owner.",
+        }
+      : { rule: "R22", state: "passed" }
 );
 
 const browserGlobalPattern = /\b(window|document|localStorage|sessionStorage|navigator)\b/;

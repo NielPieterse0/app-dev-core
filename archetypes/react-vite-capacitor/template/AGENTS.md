@@ -30,8 +30,10 @@ npm run release:check
 
 - Keep concrete adapter selection in `src/platform/composition.ts`.
 - Keep Node/TypeScript as the scripting surface in `scripts/`.
+- Keep Codex permissions owned by `.codex/config.toml`; docs point there instead of restating them.
 - Keep change records in pull requests rather than adding plan or receipt files.
 - Keep docs short and operational; point to owning files instead of restating them.
+- Treat root-level `android/` and `ios/` projects as generated output until native delivery is activated.
 
 ## Before larger work
 

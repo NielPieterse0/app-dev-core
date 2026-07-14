@@ -8,7 +8,7 @@ React/Vite/Capacitor archetype.
 ```bash
 npm install
 npm run verify
-npm run release:check   # after the repo is pushed and hosted verify is green
+npm run release:check   # after the repo is pushed, gh is authenticated, and hosted verify is green
 ```
 
 ## Read first
@@ -23,6 +23,7 @@ npm run release:check   # after the repo is pushed and hosted verify is green
 - OM-aligned source layout under `src/domain`, `src/data`, `src/features`,
   `src/ui`, and `src/platform`
 - Node-only `verify` and `release:check` entry points
+- Repo-local Codex permissions owned by `.codex/config.toml`
 - `verify` covers structure, secret scan, typecheck, lint, tests, build, and browser E2E
 - The six required capability ports plus web adapters
 - Browser Supabase env and PKCE client guards for products that later adopt
@@ -42,3 +43,6 @@ npm run release:check   # after the repo is pushed and hosted verify is green
 `src/platform/native`, `src/platform/ios`, `src/platform/android`, and
 `src/platform/desktop` are present on purpose but stay empty until a real
 delivery requirement activates them.
+
+Generated root-level `android/` and `ios/` projects stay ignored build output
+until native delivery is actually activated.

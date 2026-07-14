@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   evaluateBranchProtection,
   evaluateDependabotConfig,
+  evaluateDeviationExpiries,
   evaluateHostedChecks,
   evaluateSecurityAnalysis,
   evaluateWorkflowPermissions,
@@ -73,5 +74,26 @@ describe("evaluateSecurityAnalysis", () => {
         state: "failed",
       })
     );
+  });
+});
+
+describe("evaluateDeviationExpiries", () => {
+  it("fails when a deviation has expired", () => {
+    expect(
+      evaluateDeviationExpiries(
+        {
+          deviations: [
+            {
+              rule: "OM-11.5-PUBLIC-DISTRIBUTION",
+              expires: "2026-01-01",
+            },
+          ],
+        },
+        new Date("2026-07-14T00:00:00Z")
+      )
+    ).toMatchObject({
+      rule: "R26/deviation-expiry",
+      state: "failed",
+    });
   });
 });

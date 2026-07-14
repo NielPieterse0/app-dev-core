@@ -39,6 +39,13 @@ export type CheckRunsPayload = {
   }>;
 };
 
+export type ProductManifest = {
+  deviations?: Array<{
+    rule?: unknown;
+    expires?: unknown;
+  }>;
+};
+
 function fail(rule: string, detail: string): ReleaseCheckResult {
   return { rule, state: "failed", detail };
 }
@@ -180,4 +187,51 @@ export function evaluateSecurityAnalysis(repo: RepoMetadataPayload): ReleaseChec
   );
 
   return results;
+}
+
+function parseIsoDate(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function evaluateDeviationExpiries(
+  manifest: ProductManifest,
+  today = new Date()
+): ReleaseCheckResult {
+  const deviations = manifest.deviations ?? [];
+  const expired: string[] = [];
+  const invalid: string[] = [];
+  const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+
+  deviations.forEach((deviation, index) => {
+    if (typeof deviation.expires !== "string") {
+      invalid.push(`deviations[${index}] missing expires`);
+      return;
+    }
+
+    const expires = parseIsoDate(deviation.expires);
+    if (!expires) {
+      invalid.push(`deviations[${index}] invalid expires "${deviation.expires}"`);
+      return;
+    }
+
+    if (expires < todayUtc) {
+      const rule = typeof deviation.rule === "string" ? deviation.rule : `deviations[${index}]`;
+      expired.push(`${rule} expired on ${deviation.expires}`);
+    }
+  });
+
+  if (invalid.length) {
+    return fail("R26/deviation-expiry", invalid.join("; "));
+  }
+
+  if (expired.length) {
+    return fail("R26/deviation-expiry", expired.join("; "));
+  }
+
+  return pass("R26/deviation-expiry", "All recorded deviations have valid, unexpired dates.");
 }
