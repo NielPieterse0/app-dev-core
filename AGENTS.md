@@ -32,6 +32,14 @@ npm run verify-core          # run every CI rule against this repository
 npm run test-enforcement     # run every rule against its own pass + fail fixtures
 ```
 
+## GitHub change flow
+
+`npm run verify` is the local preflight, not the hosted verdict.
+The change record lives in the pull request body.
+Hosted `verify` dispatches from [`.github/workflows/verify.yml`](./.github/workflows/verify.yml) on every PR and on pushes to `main`.
+A plain feature-branch push does not satisfy the stop gate here.
+Close work only after the PR commit shows the hosted `verify` check with dispatched green status.
+
 ## Every change carries this line in the PR
 
 ```

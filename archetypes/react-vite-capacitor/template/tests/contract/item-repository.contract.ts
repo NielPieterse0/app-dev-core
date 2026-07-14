@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { LocalItemRepository } from "@/data/adapters/local/LocalItemRepository.js";
+import { itemRepositoryAdapterFactories } from "@/data/adapters/index.js";
 import type { ItemRepository } from "@/data/ports/ItemRepository.js";
-import { LocalStorageKeyValueStore } from "@/platform/web/adapters/LocalStorageKeyValueStore.js";
+import { createWebCapabilities } from "@/platform/web/adapters/index.js";
 
-const adapters: { name: string; make: () => ItemRepository }[] = [
-  {
-    name: "local",
-    make: () => new LocalItemRepository(new LocalStorageKeyValueStore()),
-  },
-];
+const adapters = itemRepositoryAdapterFactories.map((factory) => ({
+  name: factory.name,
+  make: () => factory.make(createWebCapabilities()),
+})) satisfies { name: string; make: () => ItemRepository }[];
 
 describe.each(adapters)("ItemRepository contract - %s", ({ make }) => {
   let repository: ItemRepository;

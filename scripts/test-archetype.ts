@@ -36,7 +36,6 @@ const archetype = readArg("--archetype") ?? "react-vite-capacitor";
 const packageName = readArg("--name") ?? `clean-room-${archetype}`;
 const appTitle = readArg("--title");
 const keep = hasFlag("--keep-output");
-const runE2e = !hasFlag("--no-e2e");
 
 const tempRoot = createTempDir("app-dev-core-archetype-");
 const targetDir = join(tempRoot, packageName);
@@ -51,12 +50,8 @@ try {
   });
 
   run("npm", ["ci"], generated.targetDir);
+  run("npx", ["playwright", "install", "--with-deps", "chromium"], generated.targetDir);
   run("npm", ["run", "verify"], generated.targetDir);
-
-  if (runE2e) {
-    run("npx", ["playwright", "install", "--with-deps", "chromium"], generated.targetDir);
-    run("npx", ["playwright", "test"], generated.targetDir);
-  }
 
   console.log(
     JSON.stringify(
@@ -64,7 +59,7 @@ try {
         tool: "test-archetype",
         archetype,
         targetDir: generated.targetDir,
-        e2e: runE2e ? "passed" : "skipped",
+        e2e: "passed",
         verdict: "passed",
       },
       null,

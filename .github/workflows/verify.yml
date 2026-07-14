@@ -50,4 +50,4 @@ jobs:
         run: npm run test-generator
 
       - name: Archetype clean-room
-        run: npm run test-archetype -- --no-e2e
+        run: npm run test-archetype

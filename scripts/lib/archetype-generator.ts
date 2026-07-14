@@ -76,18 +76,45 @@ function listFiles(root: string, current = root, files: string[] = []) {
   return files;
 }
 
-function copyTree(sourceDir: string, targetDir: string) {
+function listEntries(root: string, current = root, entries: string[] = []) {
+  for (const entry of readdirSync(current, { withFileTypes: true })) {
+    if (SKIP.has(entry.name)) {
+      continue;
+    }
+
+    const fullPath = join(current, entry.name);
+    const relativePath = relative(root, fullPath).replace(/\\/g, "/");
+
+    entries.push(relativePath);
+
+    if (entry.isDirectory()) {
+      listEntries(root, fullPath, entries);
+    }
+  }
+
+  return entries;
+}
+
+function replaceKnownTokens(value: string, replacements: Record<string, string>) {
+  return Object.entries(replacements).reduce(
+    (content, [token, replacement]) => content.split(token).join(replacement),
+    value
+  );
+}
+
+function copyTree(sourceDir: string, targetDir: string, replacements: Record<string, string>) {
   for (const entry of readdirSync(sourceDir, { withFileTypes: true })) {
     if (SKIP.has(entry.name)) {
       continue;
     }
 
     const sourcePath = join(sourceDir, entry.name);
-    const targetPath = join(targetDir, SOURCE_SEGMENT_MAP[entry.name] ?? entry.name);
+    const sourceName = SOURCE_SEGMENT_MAP[entry.name] ?? entry.name;
+    const targetPath = join(targetDir, replaceKnownTokens(sourceName, replacements));
 
     if (entry.isDirectory()) {
       mkdirSync(targetPath, { recursive: true });
-      copyTree(sourcePath, targetPath);
+      copyTree(sourcePath, targetPath, replacements);
       continue;
     }
 
@@ -115,12 +142,18 @@ function replaceTokens(targetDir: string, replacements: Record<string, string>) 
 function findUnresolvedTokens(targetDir: string) {
   const unresolved: string[] = [];
 
-  for (const relativePath of listFiles(targetDir)) {
-    if (!TEXT_FILE.test(relativePath)) {
-      continue;
+  for (const relativePath of listEntries(targetDir)) {
+    const pathMatches = relativePath.match(TOKEN);
+
+    if (pathMatches) {
+      unresolved.push(`${relativePath}: path contains ${pathMatches.join(", ")}`);
     }
 
     const absolutePath = join(targetDir, relativePath);
+    if (statSync(absolutePath).isDirectory() || !TEXT_FILE.test(relativePath)) {
+      continue;
+    }
+
     const content = readFileSync(absolutePath, "utf8");
     const matches = content.match(TOKEN);
 
@@ -191,13 +224,14 @@ export function generateArchetype(options: GenerateArchetypeOptions) {
   mkdirSync(targetDir, { recursive: true });
 
   try {
-    copyTree(sourceDir, targetDir);
-    replaceTokens(targetDir, {
+    const replacements = {
       "__app_title__": appTitle,
       "__package_name__": packageName,
       "__product_name__": productName,
       "__workspace_name__": workspaceName,
-    });
+    };
+    copyTree(sourceDir, targetDir, replacements);
+    replaceTokens(targetDir, replacements);
     syncManifest(targetDir, repoRoot, options.archetype, productName);
 
     const unresolved = findUnresolvedTokens(targetDir);

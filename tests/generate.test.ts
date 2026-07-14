@@ -87,6 +87,7 @@ describe("generateArchetype", () => {
     );
     writeFileSync(join(sourceDir, ".codex", "config.toml"), 'default_permissions = "__workspace_name__"\n');
     writeFileSync(join(sourceDir, "README.md"), "# __app_title__\n__unknown_token__\n");
+    writeFileSync(join(sourceDir, "__unknown_path_token__.md"), "path token file\n");
 
     expect(() =>
       generateArchetype({
@@ -97,5 +98,37 @@ describe("generateArchetype", () => {
         targetDir,
       })
     ).toThrow(/Unresolved tokens remain/);
+  });
+
+  it("replaces supported tokens in generated path names", () => {
+    const sourceDir = makeTempDir("app-dev-core-path-archetype-");
+    const targetRoot = makeTempDir("app-dev-core-path-generated-");
+    const targetDir = join(targetRoot, "fieldnote-mobile");
+
+    mkdirSync(join(sourceDir, ".codex"), { recursive: true });
+    writeFileSync(join(sourceDir, "package.json"), '{ "name": "__package_name__" }\n');
+    writeFileSync(
+      join(sourceDir, "app-dev.manifest.json"),
+      JSON.stringify(
+        {
+          product: { name: "__product_name__" },
+          baseline: { core: "0.0.0", operatingModel: "0.0.0", archetype: { name: "x", version: "0.0.0" } },
+        },
+        null,
+        2
+      )
+    );
+    writeFileSync(join(sourceDir, ".codex", "config.toml"), 'default_permissions = "__workspace_name__"\n');
+    writeFileSync(join(sourceDir, "__package_name__.md"), "# generated\n");
+
+    generateArchetype({
+      archetype: "react-vite-capacitor",
+      packageName: "fieldnote-mobile",
+      repoRoot,
+      sourceDir,
+      targetDir,
+    });
+
+    expect(readFileSync(join(targetDir, "fieldnote-mobile.md"), "utf8")).toContain("# generated");
   });
 });

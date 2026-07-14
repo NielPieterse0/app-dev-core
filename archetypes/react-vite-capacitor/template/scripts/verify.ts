@@ -12,6 +12,10 @@ const steps: { name: string; command: string[] }[] = [
     command: ["node", "./node_modules/tsx/dist/cli.mjs", "./scripts/verify-structure.ts"],
   },
   {
+    name: "secrets",
+    command: ["node", "./node_modules/tsx/dist/cli.mjs", "./scripts/scan-secrets.ts"],
+  },
+  {
     name: "typecheck",
     command: ["node", "./node_modules/typescript/bin/tsc", "--noEmit"],
   },
@@ -26,6 +30,16 @@ const steps: { name: string; command: string[] }[] = [
   {
     name: "build",
     command: ["node", "./node_modules/vite/bin/vite.js", "build"],
+  },
+  {
+    name: "e2e",
+    command: [
+      "node",
+      "./node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "./playwright.config.ts",
+    ],
   },
 ];
 

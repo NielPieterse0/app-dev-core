@@ -14,9 +14,10 @@ If it drifts from the real OM adopted by the product baseline, refresh it.
 | Example domain-port contract | `src/data/ports/ItemRepository.ts` | `tests/contract/item-repository.contract.ts` |
 | Platform isolation | `src/platform/**` only | `eslint.config.js` and `scripts/verify-structure.ts` |
 | Browser Supabase guard | `src/platform/web/adapters/` | env parsing tests plus seeded PKCE client wiring |
-| Canonical product verification | `scripts/verify.ts` | structure, typecheck, lint, tests, build |
+| Canonical product verification | `scripts/verify.ts` | structure, secret scan, typecheck, lint, tests, build, browser E2E |
 | Hosted verify workflow | `.github/workflows/verify.yml` | root-level GitHub Actions workflow |
 | PR evidence contract | `.github/pull_request_template.md` | required PR shape for generated repos |
+| Release gate | `scripts/release-check.ts` | GitHub branch protection + current-commit hosted verify evidence |
 
 ## What stays intentionally unproven in the seed
 
