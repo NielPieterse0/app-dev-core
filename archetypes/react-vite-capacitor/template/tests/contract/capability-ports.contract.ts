@@ -8,15 +8,10 @@ import type {
 import type { KeyValueStore } from "@/data/ports/capability/KeyValueStore.js";
 import type { LinkOpener } from "@/data/ports/capability/LinkOpener.js";
 import type { NetworkStatus } from "@/data/ports/capability/NetworkStatus.js";
-import { AnchorFileExporter } from "@/platform/web/adapters/AnchorFileExporter.js";
-import { DomAppLifecycle } from "@/platform/web/adapters/DomAppLifecycle.js";
-import { HistoryDeepLink } from "@/platform/web/adapters/HistoryDeepLink.js";
-import { LocalStorageKeyValueStore } from "@/platform/web/adapters/LocalStorageKeyValueStore.js";
-import { NavigatorNetworkStatus } from "@/platform/web/adapters/NavigatorNetworkStatus.js";
-import { WindowLinkOpener } from "@/platform/web/adapters/WindowLinkOpener.js";
+import { capabilityAdapterFactories } from "@/platform/web/adapters/index.js";
 
 describe.each<{ name: string; make: () => KeyValueStore }>([
-  { name: "web", make: () => new LocalStorageKeyValueStore() },
+  ...capabilityAdapterFactories.keyValueStore,
 ])("KeyValueStore contract - %s", ({ make }) => {
   let keyValueStore: KeyValueStore;
 
@@ -36,7 +31,7 @@ describe.each<{ name: string; make: () => KeyValueStore }>([
 });
 
 describe.each<{ name: string; make: () => NetworkStatus }>([
-  { name: "web", make: () => new NavigatorNetworkStatus() },
+  ...capabilityAdapterFactories.networkStatus,
 ])("NetworkStatus contract - %s", ({ make }) => {
   it("reports a boolean online value", () => {
     expect(typeof make().isOnline()).toBe("boolean");
@@ -50,7 +45,7 @@ describe.each<{ name: string; make: () => NetworkStatus }>([
 });
 
 describe.each<{ name: string; make: () => FileExporter }>([
-  { name: "web", make: () => new AnchorFileExporter() },
+  ...capabilityAdapterFactories.fileExporter,
 ])("FileExporter contract - %s", ({ make }) => {
   it("exports without throwing", async () => {
     const originalCreateObjectUrl = URL.createObjectURL;
@@ -76,7 +71,7 @@ describe.each<{ name: string; make: () => FileExporter }>([
 });
 
 describe.each<{ name: string; make: () => AppLifecycle }>([
-  { name: "web", make: () => new DomAppLifecycle() },
+  ...capabilityAdapterFactories.appLifecycle,
 ])("AppLifecycle contract - %s", ({ make }) => {
   it("returns unsubscribe functions", () => {
     const lifecycle = make();
@@ -92,7 +87,7 @@ describe.each<{ name: string; make: () => AppLifecycle }>([
 });
 
 describe.each<{ name: string; make: () => DeepLink }>([
-  { name: "web", make: () => new HistoryDeepLink() },
+  ...capabilityAdapterFactories.deepLink,
 ])("DeepLink contract - %s", ({ make }) => {
   it("reads the current path", () => {
     expect(make().getCurrentPath()).toContain("/");
@@ -113,7 +108,7 @@ describe.each<{ name: string; make: () => DeepLink }>([
 });
 
 describe.each<{ name: string; make: () => LinkOpener }>([
-  { name: "web", make: () => new WindowLinkOpener() },
+  ...capabilityAdapterFactories.linkOpener,
 ])("LinkOpener contract - %s", ({ make }) => {
   it("opens a URL", async () => {
     const open = vi.spyOn(window, "open").mockImplementation(() => null);

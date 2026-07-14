@@ -1,5 +1,5 @@
 import type { Capabilities } from "../data/ports/capability/index.js";
-import { LocalItemRepository } from "../data/adapters/local/LocalItemRepository.js";
+import { createDefaultItemRepository } from "../data/adapters/index.js";
 import type { ItemRepository } from "../data/ports/ItemRepository.js";
 
 async function isNativePlatform(): Promise<boolean> {
@@ -31,5 +31,5 @@ export async function getCapabilities(): Promise<Capabilities> {
 
 export async function createExampleItemRepository(): Promise<ItemRepository> {
   const capabilities = await getCapabilities();
-  return new LocalItemRepository(capabilities.keyValueStore);
+  return createDefaultItemRepository(capabilities);
 }

@@ -6,11 +6,41 @@ import { LocalStorageKeyValueStore } from "./LocalStorageKeyValueStore.js";
 import { NavigatorNetworkStatus } from "./NavigatorNetworkStatus.js";
 import { WindowLinkOpener } from "./WindowLinkOpener.js";
 
-export const webCapabilities: Capabilities = {
-  appLifecycle: new DomAppLifecycle(),
-  deepLink: new HistoryDeepLink(),
-  fileExporter: new AnchorFileExporter(),
-  keyValueStore: new LocalStorageKeyValueStore(),
-  linkOpener: new WindowLinkOpener(),
-  networkStatus: new NavigatorNetworkStatus(),
+type CapabilityAdapterFactoryMap = {
+  [K in keyof Capabilities]: ReadonlyArray<{
+    name: string;
+    make(): Capabilities[K];
+  }>;
 };
+
+export const capabilityAdapterFactories: CapabilityAdapterFactoryMap = {
+  appLifecycle: [{ name: "dom-visibility", make: () => new DomAppLifecycle() }],
+  deepLink: [{ name: "history-api", make: () => new HistoryDeepLink() }],
+  fileExporter: [{ name: "anchor-download", make: () => new AnchorFileExporter() }],
+  keyValueStore: [{ name: "local-storage", make: () => new LocalStorageKeyValueStore() }],
+  linkOpener: [{ name: "window-open", make: () => new WindowLinkOpener() }],
+  networkStatus: [{ name: "navigator-online", make: () => new NavigatorNetworkStatus() }],
+};
+
+function requiredFactory<K extends keyof Capabilities>(port: K) {
+  const factory = capabilityAdapterFactories[port][0];
+
+  if (!factory) {
+    throw new Error(`No adapter factories are registered for capability port "${port}".`);
+  }
+
+  return factory;
+}
+
+export function createWebCapabilities(): Capabilities {
+  return {
+    appLifecycle: requiredFactory("appLifecycle").make(),
+    deepLink: requiredFactory("deepLink").make(),
+    fileExporter: requiredFactory("fileExporter").make(),
+    keyValueStore: requiredFactory("keyValueStore").make(),
+    linkOpener: requiredFactory("linkOpener").make(),
+    networkStatus: requiredFactory("networkStatus").make(),
+  };
+}
+
+export const webCapabilities: Capabilities = createWebCapabilities();

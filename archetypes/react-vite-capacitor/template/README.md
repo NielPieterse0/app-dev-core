@@ -8,7 +8,7 @@ React/Vite/Capacitor archetype.
 ```bash
 npm install
 npm run verify
-npx playwright test
+npm run release:check   # after the repo is pushed and hosted verify is green
 ```
 
 ## Read first
@@ -23,6 +23,7 @@ npx playwright test
 - OM-aligned source layout under `src/domain`, `src/data`, `src/features`,
   `src/ui`, and `src/platform`
 - Node-only `verify` and `release:check` entry points
+- `verify` covers structure, secret scan, typecheck, lint, tests, build, and browser E2E
 - The six required capability ports plus web adapters
 - Browser Supabase env and PKCE client guards for products that later adopt
   Supabase

@@ -44,7 +44,7 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const repo = spawnSync("gh", ["repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"], {
+  const repo = spawnSync("gh", ["repo", "view", "--json", "nameWithOwner,defaultBranchRef"], {
     encoding: "utf8",
   });
 
@@ -56,8 +56,23 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const slug = repo.stdout.trim();
-  const protection = spawnSync("gh", ["api", `repos/${slug}/branches/main/protection`], {
+  const repoInfo = JSON.parse(repo.stdout) as {
+    defaultBranchRef?: { name?: string };
+    nameWithOwner?: string;
+  };
+
+  const slug = repoInfo.nameWithOwner?.trim();
+  const defaultBranch = repoInfo.defaultBranchRef?.name?.trim();
+
+  if (!slug || !defaultBranch) {
+    return {
+      rule: "R08",
+      state: "not-run",
+      detail: "Unable to determine the GitHub repository or default branch.",
+    };
+  }
+
+  const protection = spawnSync("gh", ["api", `repos/${slug}/branches/${defaultBranch}/protection`], {
     encoding: "utf8",
   });
 
@@ -69,17 +84,93 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const checkRuns = spawnSync(
-    "gh",
-    ["api", `repos/${slug}/commits/main/check-runs`, "-q", ".total_count"],
-    { encoding: "utf8" }
+  const protectionInfo = JSON.parse(protection.stdout) as {
+    required_status_checks?: {
+      contexts?: string[];
+      checks?: Array<{ context?: string }>;
+    };
+  };
+
+  const requiredChecks = new Set([
+    ...(protectionInfo.required_status_checks?.contexts ?? []),
+    ...(protectionInfo.required_status_checks?.checks ?? []).flatMap((entry) =>
+      entry.context ? [entry.context] : []
+    ),
+  ]);
+
+  if (!requiredChecks.has("verify")) {
+    return {
+      rule: "R08",
+      state: "failed",
+      detail: `${defaultBranch} branch protection does not require the verify check.`,
+    };
+  }
+
+  const headSha = spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" });
+
+  if (headSha.status !== 0) {
+    return {
+      rule: "R08",
+      state: "not-run",
+      detail: "Unable to determine the current HEAD SHA.",
+    };
+  }
+
+  const sha = headSha.stdout.trim();
+  const checkRuns = spawnSync("gh", ["api", `repos/${slug}/commits/${sha}/check-runs`], {
+    encoding: "utf8",
+  });
+
+  if (checkRuns.status !== 0) {
+    return {
+      rule: "R08",
+      state: "not-run",
+      detail: "Current HEAD is not yet visible to GitHub checks.",
+    };
+  }
+
+  const checkRunInfo = JSON.parse(checkRuns.stdout) as {
+    total_count?: number;
+    check_runs?: Array<{
+      name?: string;
+      status?: string;
+      conclusion?: string | null;
+    }>;
+  };
+
+  if ((checkRunInfo.total_count ?? 0) === 0) {
+    return {
+      rule: "R08",
+      state: "failed",
+      detail: "Hosted check-runs total_count is 0 for the current HEAD commit.",
+    };
+  }
+
+  const verifyRuns = (checkRunInfo.check_runs ?? []).filter((run) => run.name === "verify");
+
+  if (verifyRuns.length === 0) {
+    return {
+      rule: "R08",
+      state: "failed",
+      detail: "No hosted verify check-run was found for the current HEAD commit.",
+    };
+  }
+
+  const blockingVerifyRun = verifyRuns.find(
+    (run) => run.status !== "completed" || run.conclusion !== "success"
   );
 
-  const totalCount = Number.parseInt(checkRuns.stdout.trim() || "0", 10);
-
-  return totalCount > 0
-    ? { rule: "R08", state: "passed", detail: `${totalCount} hosted check-runs observed.` }
-    : { rule: "R08", state: "failed", detail: "Hosted check-runs total_count is 0." };
+  return blockingVerifyRun
+    ? {
+        rule: "R08",
+        state: "failed",
+        detail: `Hosted verify for the current HEAD is ${blockingVerifyRun.status}/${blockingVerifyRun.conclusion ?? "pending"}.`,
+      }
+    : {
+        rule: "R08",
+        state: "passed",
+        detail: `Hosted verify is green for ${sha.slice(0, 7)} and required on ${defaultBranch}.`,
+      };
 }
 
 results.push(ghResult());

@@ -25,8 +25,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run verify
-      - run: npm run release:check
-      - run: npx playwright test
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
