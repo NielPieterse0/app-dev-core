@@ -24,10 +24,11 @@
   },
   "packageManager": "npm@10.9.0",
   "scripts": {
-    "verify": "npm run governance:check && npm run verify-core && npm run test-enforcement && npm run test-generator && npm run test-release-check && npm run test-archetype",
+    "verify": "npm run governance:check && npm run typecheck && npm run verify-core && npm run test-enforcement && npm run test-generator && npm run test-release-check && npm run test-archetype",
     "release:check": "tsx scripts/release-check.ts",
     "governance:compile": "tsx governance/compile.ts",
     "governance:check": "tsx governance/compile.ts --check",
+    "typecheck": "tsc --noEmit",
     "verify-core": "tsx scripts/verify-core.ts",
     "test-enforcement": "vitest run tests/enforcement governance/registry.test.ts",
     "test-generator": "vitest run tests/generate.test.ts",

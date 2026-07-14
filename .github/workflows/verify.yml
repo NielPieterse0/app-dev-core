@@ -40,6 +40,9 @@ jobs:
       - name: Governance drift — generated artefacts match governance/rules.ts
         run: npm run governance:check
 
+      - name: Typecheck - prove the root repository compiles under the pinned TypeScript version
+        run: npm run typecheck
+
       - name: Registry — run every CI rule against this repository
         run: npm run verify-core
 

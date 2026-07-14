@@ -30,7 +30,7 @@ and that applies to this kit as much as to anything it governs [R07].
 | `npm install` | Passed; lockfile generated. Initial Vitest/Vite advisory surface was fixed by updating dev dependencies and adding `@types/node`. |
 | `npx tsc --noEmit` | Passed. During first-use validation, the temporary `fail: []` experiment failed to compile as intended. |
 | `npm audit --json` | Passed with 0 vulnerabilities. |
-| `npm run verify` | Passed locally with governance, registry, fixture, generator, and clean-room archetype checks. |
+| `npm run verify` | Passed locally with governance, root typecheck, registry, fixture, generator, and clean-room archetype checks. |
 | `npm run release:check` | Passed locally against the live public repo with hosted branch protection, workflow permissions, secret scanning, private vulnerability reporting, and public commit-email posture all green. |
 | Hosted `verify` | Passed on first push to `main`, run `29303887504`, commit `6588897b77e3df27cca33e762cc78b2dac5aabc5`. |
 | Branch protection | Confirmed after the repository became public: PR required, strict `verify`, force-push disabled. |
@@ -41,7 +41,7 @@ and that applies to this kit as much as to anything it governs [R07].
 git init && git add -A && git commit -m "chore: bootstrap app-dev-core"
 npm ci
 npx tsc --noEmit             # then try the fail: [] experiment above
-npm run verify               # drift gate + registry + fixtures + generator + clean-room archetype
+npm run verify               # drift gate + typecheck + registry + fixtures + generator + clean-room archetype
 npm run release:check        # hosted GitHub settings + secret scanning + public email/privacy posture
 gh repo create app-dev-core --public --source=. --push
 # branch protection + required check `verify`

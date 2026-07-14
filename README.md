@@ -19,7 +19,7 @@ Documentation cannot prevent drift, because documentation *is* the drift.
 
 ```bash
 npm ci
-npm run verify               # drift gate + registry + fixtures + generator + clean-room archetype
+npm run verify               # drift gate + typecheck + registry + fixtures + generator + clean-room archetype
 npm run release:check        # hosted GitHub settings + public-repo security/privacy posture
 npm run governance:compile   # after editing the registry
 ```
@@ -40,5 +40,5 @@ npm run verify
 npm run release:check
 ```
 
-`verify` proves the repository tree and generated artefacts.
+`verify` proves the repository tree, the pinned TypeScript compile surface, and the generated artefacts.
 `release:check` proves the hosted GitHub surface that the tree alone cannot see.
