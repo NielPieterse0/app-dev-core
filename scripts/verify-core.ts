@@ -11,7 +11,7 @@ import { RULES } from "../governance/rules.js";
 import { isCi, aggregate, PASSING, type Repo, type Finding } from "../governance/types.js";
 
 const ROOT = process.cwd();
-const SKIP = new Set([".git", "node_modules", "dist", "coverage", ".write"]);
+const SKIP = new Set([".git", "node_modules", "dist", "coverage", ".work"]);
 
 function load(dir: string, repo: Repo = {}): Repo {
   for (const e of readdirSync(dir, { withFileTypes: true })) {

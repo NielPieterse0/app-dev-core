@@ -10,7 +10,7 @@ coverage/
 # Ephemeral agent output — OM §4.2 / B5.
 # Agent scratch NEVER reaches the default branch. Durable value goes to Git
 # history and release tags, not to a permanent execution diary.
-.write/
+.work/
 .local/
 .superpowers/
 

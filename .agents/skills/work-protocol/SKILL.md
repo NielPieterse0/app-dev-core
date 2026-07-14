@@ -13,7 +13,7 @@ description: >
 Sequence the repository contract. Point to the owner files instead of restating them.
 
 Use `token-wize` alongside this skill on every task.
-For larger approved planned or gated work, or when implementing a material spec, use the available Superpowers skills for planning and execution support, but keep durable plan artifacts out of this repository and use the PR plus `.write/` for transient planning notes instead.
+For larger approved planned or gated work, or when implementing a material spec, use the available Superpowers skills for planning and execution support, but keep durable plan artifacts out of this repository and use the PR plus `.work/` for transient planning notes instead.
 
 ## 1. Read the live owners first
 
@@ -34,7 +34,7 @@ Use the live repository state as truth if an older note disagrees.
 
 ## 3. Keep scratch and records in the right place
 
-- Keep transient notes and agent scratch in `.write/`.
+- Keep transient notes and agent scratch in `.work/`.
 - Keep the change record in the PR body.
 - Do not add task ledgers, receipt files, or permanent worker logs.
 
