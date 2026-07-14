@@ -66,6 +66,8 @@ function prTemplate(): string {
     "",
     "**Class:** direct | planned | gated · **Compatibility:** patch | minor | major",
     "",
+    "**Origin:** core | product:<name> · **Type:** correction | proposal",
+    "",
     "**Problem:**",
     "",
     "**Acceptance condition:**",

@@ -7,11 +7,11 @@ and that applies to this kit as much as to anything it governs [R07].
 
 | Item | Evidence |
 |---|---|
-| `governance/compile.ts` | Compiled 4 artefacts from 16 rules. |
+| `governance/compile.ts` | Compiled 4 artefacts from 20 rules. |
 | **Drift gate** | Hand-edited a generated hook → `governance:check` **exit 1, DRIFT reported**. Recompiled → clean. |
 | Compiled `guard-destructive.mjs` | `git push --force` → **blocked (exit 2)**. `npm run verify` → **allowed (exit 0)**. |
 | Compiled `guard-grammar.mjs` | `docs/plans/x.md` → **blocked, cites [R18]**. |
-| `scripts/verify-core.ts` | Runs the registry against this repo → **verdict: passed, 15 CI rules**. |
+| `scripts/verify-core.ts` | Runs the registry against this repo → **verdict: passed, 16 CI rules**. |
 
 ## Not proven — check on first clone
 
