@@ -1,0 +1,28 @@
+{
+  "name": "app-dev-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Development control plane: archetypes, generator, schemas, enforcement.",
+  "type": "module",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "packageManager": "npm@10.9.0",
+  "scripts": {
+    "verify": "npm run governance:check && npm run verify-core && npm run test-enforcement",
+    "release:check": "tsx scripts/release-check.ts",
+    "governance:compile": "tsx governance/compile.ts",
+    "governance:check": "tsx governance/compile.ts --check",
+    "verify-core": "tsx scripts/verify-core.ts",
+    "test-enforcement": "vitest run tests/enforcement",
+    "test-generator": "vitest run tests/generator",
+    "test-archetype": "tsx scripts/test-archetype.ts",
+    "generate": "tsx scripts/generate.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

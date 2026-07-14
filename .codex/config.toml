@@ -1,0 +1,63 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# app-dev-core — project-scoped Codex configuration
+#
+# FACT OWNERSHIP (OM §5): this file is the SINGLE OWNER of the active permission
+# profile. No README, AGENTS.md or standard may restate it. `npm run verify-core`
+# asserts that documentation agrees with this file (R22). The previous repository's
+# README claimed permissions were disabled while config.toml enabled them — that
+# class of defect is what R22 exists to kill.
+#
+# Project-scoped config loads ONLY when the project is trusted.
+# Provider / auth / notify / telemetry keys are ignored here by design — put those
+# in ~/.codex/config.toml.
+
+# --- Permissions (OM §12.3 — least privilege) --------------------------------
+# Built-ins: ":read-only", ":workspace", ":danger-full-access".
+# A custom name requires a matching [permissions.<name>] table.
+# Do NOT combine with sandbox_mode / [sandbox_workspace_write].
+default_permissions = "app-dev-core"
+
+[permissions.app-dev-core.filesystem.":workspace_roots"]
+"." = "write"        # repository root writable
+".codex" = "read"    # governance config is NOT self-modifiable by the agent
+".git" = "write"     # needed to stage/commit; guarded by rules + hooks below
+
+# --- Approvals ---------------------------------------------------------------
+approval_policy = "on-request"
+
+# --- Network (OM §12.3 — off by default) -------------------------------------
+# Enable per-task, explicitly, when a task genuinely needs it (e.g. `npm ci`).
+# Do not silently widen this.
+[features.network_proxy]
+enabled = false
+
+# --- Hooks (OM §12.2 — SUPPLEMENTARY, never the only control) ----------------
+# Codex rules are experimental and are skipped in untrusted repositories.
+# Therefore every critical control ALSO exists in CI (tests/enforcement/).
+# These hooks are a fast local first line, not the enforcement layer.
+features.hooks = true
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-destructive.mjs"
+commandWindows = "node .codex/hooks/guard-destructive.mjs"
+
+[[hooks.PreToolUse]]
+matcher = "Write"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-grammar.mjs"
+commandWindows = "node .codex/hooks/guard-grammar.mjs"
+
+[[hooks.PreToolUse]]
+matcher = "apply_patch"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-grammar.mjs"
+commandWindows = "node .codex/hooks/guard-grammar.mjs"
+
+# --- MCP ---------------------------------------------------------------------
+# None. GitHub MCP is a user-level tool, not a repository dependency.

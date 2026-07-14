@@ -1,0 +1,54 @@
+# app-dev-core — hosted CI.
+#
+# OM §8.1 / R05: hosted CI runs on the default branch and every PR FROM THE FIRST
+# PUSH. Not from first release. The previous repository's "CI verified" receipts were
+# backed only by local runs against a workflow path GitHub Actions never saw.
+#
+# This file MUST live at .github/workflows/ in the REPOSITORY ROOT (R06).
+# Nested workflow paths are invisible to GitHub Actions and dispatch zero check-runs.
+
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read          # OM §8.3 — minimal workflow permissions
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc     # OM §7.2 / R11 — pinned. NEVER lts/* or latest.
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # The drift gate. A hand-edited copy of a rule cannot survive a merge.
+      - name: Governance drift — generated artefacts match governance/rules.ts
+        run: npm run governance:check
+
+      - name: Registry — run every CI rule against this repository
+        run: npm run verify-core
+
+      - name: Fixtures — every rule against its own PASS and FAIL cases
+        run: npm run test-enforcement
+
+      # Enable as each lands. A job that does not exist must not be reported as passing.
+      # OM §8.2 / R07: `missing` is never `passed`.
+      # - name: Generator fixtures
+      #   run: npm run test-generator
+      # - name: Archetype clean-room
+      #   run: npm run test-archetype
