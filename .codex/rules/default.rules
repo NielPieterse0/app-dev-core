@@ -1,0 +1,52 @@
+# app-dev-core — Codex execution rules
+#
+# ⚠ VERIFY BEFORE FIRST USE: the Codex rules feature is EXPERIMENTAL and its file
+# syntax may have changed. Confirm against https://developers.openai.com/codex/rules
+# and adjust. See VERIFY-BEFORE-USE.md.
+#
+# ⚠ These rules are SUPPLEMENTARY (OM §12.2). Rules are skipped in untrusted
+# repositories, so nothing critical may depend on them alone. Every rule below has
+# a corresponding CI check in tests/enforcement/ — that is the real control.
+
+# ---------- FORBID: irreversible or out-of-scope ----------
+forbid  git push --force
+forbid  git push -f
+forbid  git push --force-with-lease
+forbid  git reset --hard
+forbid  git clean -fdx
+forbid  git filter-repo
+forbid  git rebase -i
+forbid  rm -rf /
+forbid  rm -rf ~
+forbid  npm publish
+forbid  npx supabase db reset --linked
+forbid  npx supabase db push --linked
+
+# Tooling language is Node/TS (OM §7.1, R10). Never invoke a shell interpreter
+# as a build/verification step.
+forbid  powershell
+forbid  pwsh
+forbid  cmd.exe
+
+# ---------- PROMPT: reversible but consequential ----------
+prompt  git push
+prompt  git branch -D
+prompt  git tag -d
+prompt  npm install
+prompt  npm ci
+prompt  gh pr merge
+prompt  gh release create
+
+# ---------- ALLOW: read-only and verification ----------
+allow   git status
+allow   git diff
+allow   git log
+allow   git add
+allow   git commit
+allow   npm run verify
+allow   npm run verify-core
+allow   npm run test-generator
+allow   npm run test-archetype
+allow   npm run test-enforcement
+allow   npm test
+allow   node

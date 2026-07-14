@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/NielPieterse0/app-dev-core/schemas/app-dev.manifest.schema.json",
+  "title": "app-dev.manifest.json",
+  "description": "Product provenance. Records which baseline generated this product. Creates NO runtime dependency (OM §10.7). Per-file vendoring metadata, drift classifiers and staleness states are DEFERRED (OM §14) until a real drift incident occurs.",
+  "type": "object",
+  "required": ["schemaVersion", "product", "baseline", "riskProfile"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "string", "const": "1.0.0" },
+    "product": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["core", "operatingModel", "archetype"],
+      "additionalProperties": false,
+      "properties": {
+        "core": { "type": "string" },
+        "operatingModel": { "type": "string" },
+        "archetype": {
+          "type": "object",
+          "required": ["name", "version", "status"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" },
+            "status": {
+              "enum": ["experimental", "supported", "deprecated", "retired"],
+              "description": "OM §10.5: an archetype is 'experimental' until a product generated from it has SHIPPED. Not before."
+            }
+          }
+        }
+      }
+    },
+    "riskProfile": {
+      "enum": ["standard", "elevated", "high"],
+      "description": "OM §12. Drives the minimum-control matrix. 'elevated' and above require real-Postgres RLS tests (R13)."
+    },
+    "deviations": {
+      "type": "array",
+      "description": "OM §13. Every deviation expires. An expired deviation is a CI failure (R26).",
+      "items": {
+        "type": "object",
+        "required": ["rule", "reason", "expires"],
+        "properties": {
+          "rule": { "type": "string" },
+          "reason": { "type": "string" },
+          "risk": { "type": "string" },
+          "mitigation": { "type": "string" },
+          "expires": { "type": "string", "format": "date" }
+        }
+      }
+    }
+  }
+}

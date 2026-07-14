@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build / test output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Ephemeral agent output — OM §4.2 / B5.
+# Agent scratch NEVER reaches the default branch. Durable value goes to Git
+# history and release tags, not to a permanent execution diary.
+.work/
+.local/
+.superpowers/
+
+# Generated native folders (OM §7.4) — never committed
+android/
+ios/
+.gradle/
+
+# Environment — real values NEVER committed (OM §12.1)
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Playwright / test artifacts
+test-results/
+playwright-report/
