@@ -1,0 +1,36 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+default_permissions = "__workspace_name__"
+
+[permissions.__workspace_name__.filesystem.":workspace_roots"]
+"." = "write"
+".codex" = "read"
+".git" = "write"
+
+approval_policy = "on-request"
+
+[features.network_proxy]
+enabled = false
+
+features.hooks = true
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-destructive.mjs"
+commandWindows = "node .codex/hooks/guard-destructive.mjs"
+
+[[hooks.PreToolUse]]
+matcher = "Write"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-grammar.mjs"
+commandWindows = "node .codex/hooks/guard-grammar.mjs"
+
+[[hooks.PreToolUse]]
+matcher = "apply_patch"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "node .codex/hooks/guard-grammar.mjs"
+commandWindows = "node .codex/hooks/guard-grammar.mjs"

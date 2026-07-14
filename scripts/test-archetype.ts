@@ -1,16 +1,78 @@
-/**
- * test-archetype — NOT YET IMPLEMENTED.
- *
- * OM §8.2 / R07: `missing` is never `passed`. A stub that exits 0 would be a
- * false green — exactly the defect this repository exists to prevent. So it exits 1
- * and says so.
- *
- * Implement at the stage named below (OM §16). Not before.
- */
-console.error(
-  "NOT IMPLEMENTED: scripts/test-archetype.ts\n" +
-  "This exits non-zero deliberately. A stub that returned success would be a false\n" +
-  "green, and 'missing' must never aggregate to 'passed' (R07).\n" +
-  "See docs/operating-model/operating-model.md §16 for the stage that lands this."
-);
-process.exit(1);
+import { rmSync } from "node:fs";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { createTempDir, generateArchetype } from "./lib/archetype-generator.js";
+
+function command(name: string) {
+  return process.platform === "win32" ? `${name}.cmd` : name;
+}
+
+function readArg(flag: string) {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function hasFlag(flag: string) {
+  return process.argv.includes(flag);
+}
+
+function run(name: string, args: string[], cwd: string) {
+  const result = spawnSync(command(name), args, {
+    cwd,
+    shell: process.platform === "win32",
+    stdio: "inherit",
+  });
+
+  if (result.error) {
+    throw new Error(`${name} ${args.join(" ")} failed to start: ${result.error.message}`);
+  }
+
+  if (result.status !== 0) {
+    throw new Error(`${name} ${args.join(" ")} failed with exit code ${result.status ?? "unknown"}.`);
+  }
+}
+
+const archetype = readArg("--archetype") ?? "react-vite-capacitor";
+const packageName = readArg("--name") ?? `clean-room-${archetype}`;
+const appTitle = readArg("--title");
+const keep = hasFlag("--keep-output");
+const runE2e = !hasFlag("--no-e2e");
+
+const tempRoot = createTempDir("app-dev-core-archetype-");
+const targetDir = join(tempRoot, packageName);
+
+try {
+  const generated = generateArchetype({
+    archetype,
+    appTitle,
+    packageName,
+    repoRoot: process.cwd(),
+    targetDir,
+  });
+
+  run("npm", ["ci"], generated.targetDir);
+  run("npm", ["run", "verify"], generated.targetDir);
+
+  if (runE2e) {
+    run("npx", ["playwright", "install", "--with-deps", "chromium"], generated.targetDir);
+    run("npx", ["playwright", "test"], generated.targetDir);
+  }
+
+  console.log(
+    JSON.stringify(
+      {
+        tool: "test-archetype",
+        archetype,
+        targetDir: generated.targetDir,
+        e2e: runE2e ? "passed" : "skipped",
+        verdict: "passed",
+      },
+      null,
+      2
+    )
+  );
+} finally {
+  if (!keep) {
+    rmSync(tempRoot, { recursive: true, force: true });
+  }
+}
