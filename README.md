@@ -18,6 +18,6 @@ Documentation cannot prevent drift, because documentation *is* the drift.
 | `VERIFY-BEFORE-USE.md` | Proven vs unverified. Read before trusting a green build. |
 
 ```bash
-npm run verify               # drift gate + registry + fixtures
+npm run verify               # drift gate + registry + fixtures + generator + clean-room archetype
 npm run governance:compile   # after editing the registry
 ```

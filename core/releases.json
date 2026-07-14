@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "version": "0.2.0",
+    "date": "2026-07-14",
+    "category": "recommended",
+    "affects": {
+      "kind": "archetype",
+      "name": "react-vite-capacitor",
+      "version": "0.2.0"
+    },
+    "summary": "The React/Vite/Capacitor archetype now generates from a core-owned template container, restores reserved workflow and migration paths on output, and is exercised by generator plus clean-room verification in the core verify flow."
+  }
+]

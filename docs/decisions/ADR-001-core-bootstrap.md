@@ -32,6 +32,22 @@ anything enters the core.
 
 See OM §16.0 (to be moved here when the §2.9 budget breach is paid).
 
+**Source precedence for Stage 1.** The harvest is not a single-copy import:
+
+1. **`my-product-bootstrap`** is the structural seed for the archetype because it
+   already follows the OM-aligned product grammar (`domain/data/features/ui/platform`)
+   and Node-only verification shape.
+2. **`signal/`** is the preferred source for corrected controls and proven
+   infrastructure details where it has already fixed legacy defects, especially
+   browser env guarding, verification contracts, and release-gate semantics.
+3. **`app-dev-legacey-reference/templates/react-vite-capacitor/`** is a quarry for
+   reusable UI/app scaffolding and earlier template assets that still survive the
+   OM and repository-contract review.
+
+**Working rule.** When the three disagree, do not average them. Keep the OM-compliant
+shape from `my-product-bootstrap`, prefer Signal for corrected controls, and use the
+legacy template only where it adds value without reintroducing old contract defects.
+
 **Highest-value asset:** Signal's `src/lib/env.ts`. Its `ensureNoBackendOnlySupabaseKeys()`
 refuses `sb_secret_*` and `service_role` in browser env. That is a security control.
 Take it unchanged.
@@ -40,6 +56,12 @@ Take it unchanged.
 (is-configured → try primary → catch → fall back → report `backend` + `degradedReason`).
 Generalise to `createDegradablePort<T>`. **Fix the copy-paste duplication between
 `listSourceItems` and `refreshSourceItems` during generalisation — it is already drifting.**
+
+**Constraint on Signal harvesting.** Signal is a better source than the frozen legacy
+template for many controls, but it remains an active product with ongoing defects and
+product-owned behavior. Harvest only the parts that are already justified as shared
+archetype material; do not treat live Signal feature code as an authority merely
+because it is newer.
 
 ## Risk accepted
 

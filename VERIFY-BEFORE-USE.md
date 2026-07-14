@@ -12,6 +12,8 @@ and that applies to this kit as much as to anything it governs [R07].
 | Compiled `guard-destructive.mjs` | `git push --force` → **blocked (exit 2)**. `npm run verify` → **allowed (exit 0)**. |
 | Compiled `guard-grammar.mjs` | `docs/plans/x.md` → **blocked, cites [R18]**. |
 | `scripts/verify-core.ts` | Runs the registry against this repo → **verdict: passed, 16 CI rules**. |
+| `tests/generate.test.ts` | External generation passes, reserved paths are restored, and unresolved tokens fail the run. |
+| `scripts/test-archetype.ts` | Generates a clean-room product repo, runs `npm ci`, then `npm run verify` → **verdict: passed**. |
 
 ## Not proven — check on first clone
 
@@ -28,7 +30,7 @@ and that applies to this kit as much as to anything it governs [R07].
 | `npm install` | Passed; lockfile generated. Initial Vitest/Vite advisory surface was fixed by updating dev dependencies and adding `@types/node`. |
 | `npx tsc --noEmit` | Passed. During first-use validation, the temporary `fail: []` experiment failed to compile as intended. |
 | `npm audit --json` | Passed with 0 vulnerabilities. |
-| `npm run verify` | Passed locally after regenerating governance artifacts. |
+| `npm run verify` | Passed locally with governance, registry, fixture, generator, and clean-room archetype checks. |
 | Hosted `verify` | Passed on first push to `main`, run `29303887504`, commit `6588897b77e3df27cca33e762cc78b2dac5aabc5`. |
 | Branch protection | Blocked by private-repository GitHub plan limitation; not a file-state failure. |
 

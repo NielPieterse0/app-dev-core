@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "product": {
+    "name": "__product_name__",
+    "version": "0.1.0"
+  },
+  "baseline": {
+    "core": "0.2.0",
+    "operatingModel": "1.5.0",
+    "archetype": {
+      "name": "react-vite-capacitor",
+      "version": "0.2.0",
+      "status": "experimental",
+      "note": "Stage 1 harvest seed built from my-product-bootstrap, Signal, and the legacy app-dev template."
+    }
+  },
+  "riskProfile": "standard",
+  "deviations": [
+    {
+      "rule": "OM-11.5-PUBLIC-DISTRIBUTION",
+      "reason": "No backend is configured in the archetype seed.",
+      "risk": "not applicable until a backend exists",
+      "mitigation": "wire a real release gate when a backend or public write path is added",
+      "expires": "2099-01-01"
+    }
+  ]
+}

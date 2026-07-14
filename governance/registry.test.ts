@@ -18,8 +18,8 @@
  * given. None of them could have been written against this suite.
  */
 import { describe, it, expect } from "vitest";
-import { RULES } from "../../governance/rules.js";
-import { isCi, PASSING } from "../../governance/types.js";
+import { RULES } from "./rules.js";
+import { isCi, PASSING } from "./types.js";
 
 const ci = RULES.filter(isCi);
 

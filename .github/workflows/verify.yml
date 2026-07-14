@@ -46,9 +46,8 @@ jobs:
       - name: Fixtures — every rule against its own PASS and FAIL cases
         run: npm run test-enforcement
 
-      # Enable as each lands. A job that does not exist must not be reported as passing.
-      # OM §8.2 / R07: `missing` is never `passed`.
-      # - name: Generator fixtures
-      #   run: npm run test-generator
-      # - name: Archetype clean-room
-      #   run: npm run test-archetype
+      - name: Generator fixtures
+        run: npm run test-generator
+
+      - name: Archetype clean-room
+        run: npm run test-archetype -- --no-e2e

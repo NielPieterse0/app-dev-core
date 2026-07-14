@@ -1,0 +1,24 @@
+forbid  git push --force
+forbid  git push -f
+forbid  git reset --hard
+forbid  git clean -fdx
+forbid  rm -rf /
+forbid  rm -rf ~
+forbid  npm publish
+forbid  powershell
+forbid  pwsh
+forbid  cmd.exe
+
+prompt  git push
+prompt  npm install
+prompt  npm ci
+prompt  gh pr merge
+
+allow   git status
+allow   git diff
+allow   git add
+allow   git commit
+allow   npm run verify
+allow   npm run release:check
+allow   npx playwright test
+allow   node

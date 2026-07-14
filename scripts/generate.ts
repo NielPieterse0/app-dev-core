@@ -1,16 +1,42 @@
-/**
- * generate — NOT YET IMPLEMENTED.
- *
- * OM §8.2 / R07: `missing` is never `passed`. A stub that exits 0 would be a
- * false green — exactly the defect this repository exists to prevent. So it exits 1
- * and says so.
- *
- * Implement at the stage named below (OM §16). Not before.
- */
-console.error(
-  "NOT IMPLEMENTED: scripts/generate.ts\n" +
-  "This exits non-zero deliberately. A stub that returned success would be a false\n" +
-  "green, and 'missing' must never aggregate to 'passed' (R07).\n" +
-  "See docs/operating-model/operating-model.md §16 for the stage that lands this."
+import { resolve } from "node:path";
+import { generateArchetype } from "./lib/archetype-generator.js";
+
+function readArg(flag: string) {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+const archetype = readArg("--archetype") ?? "react-vite-capacitor";
+const target = readArg("--target");
+const packageName = readArg("--name") ?? readArg("--package-name");
+const title = readArg("--title");
+
+if (!target || !packageName) {
+  console.error(
+    "Usage: npm run generate -- --target <external-path> --name <package-name> " +
+      "[--title <display-title>] [--archetype react-vite-capacitor]"
+  );
+  process.exit(1);
+}
+
+const result = generateArchetype({
+  archetype,
+  appTitle: title,
+  packageName,
+  repoRoot: process.cwd(),
+  targetDir: resolve(target),
+});
+
+console.log(
+  JSON.stringify(
+    {
+      tool: "generate",
+      archetype,
+      targetDir: result.targetDir,
+      packageName: result.packageName,
+      appTitle: result.appTitle,
+    },
+    null,
+    2
+  )
 );
-process.exit(1);
