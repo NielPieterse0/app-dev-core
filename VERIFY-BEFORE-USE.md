@@ -17,11 +17,20 @@ and that applies to this kit as much as to anything it governs [R07].
 
 | Item | Why | Action |
 |---|---|---|
-| **`fail: NonEmpty<Fixture>` rejects `fail: []`** | `typescript` could not be installed here (no network), so the compile error was **never executed**. The construct `[T, ...T[]]` rejecting `[]` is standard TS, but I have not run it. | `npm ci && npx tsc --noEmit`, then temporarily add a CI rule with `fixtures: { pass, fail: [] }` and confirm it **fails to compile**. If it compiles, R23 is not structural and the claim in `AGENTS.md` is false — fix the type before trusting it. |
-| **`tests/enforcement/registry.test.ts`** | `vitest` could not be installed (no network). The suite is written and **has never executed**. | `npm run test-enforcement`. An untested test is not a control [R23]. |
+| **Hosted branch protection** | GitHub returned `HTTP 403`: "Upgrade to GitHub Pro or make this repository public to enable this feature." | Make the repository public or upgrade the plan, then protect `main` with required PR review and required check `verify`. |
 | **`.codex/rules/default.rules`** | Codex rules are experimental; the syntax here is best-effort and may not parse. | Check the Codex rules docs. Nothing critical depends on it — every rule is also a hook and a CI check. If rules fail to load you lose convenience, not control. |
 | **`[permissions.app-dev-core...]` table shape** | Custom profiles are documented; the exact nested key shape should be confirmed against your Codex version. | Codex errors loudly if wrong. Fall back to the built-in `:workspace` profile. |
-| **Branch protection** | Workflow YAML does not prove it [R08]. | Set it, then open a trivial PR and confirm `check-runs total_count > 0` [R05]. That is the exact step Signal skipped. |
+
+## First clone evidence — 2026-07-14
+
+| Item | Result |
+|---|---|
+| `npm install` | Passed; lockfile generated. Initial Vitest/Vite advisory surface was fixed by updating dev dependencies and adding `@types/node`. |
+| `npx tsc --noEmit` | Passed. During first-use validation, the temporary `fail: []` experiment failed to compile as intended. |
+| `npm audit --json` | Passed with 0 vulnerabilities. |
+| `npm run verify` | Passed locally after regenerating governance artifacts. |
+| Hosted `verify` | Passed on first push to `main`, run `29303887504`, commit `6588897b77e3df27cca33e762cc78b2dac5aabc5`. |
+| Branch protection | Blocked by private-repository GitHub plan limitation; not a file-state failure. |
 
 ## First run
 
