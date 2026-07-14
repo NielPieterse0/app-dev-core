@@ -1,6 +1,6 @@
 /** The directory grammar. Single owner of "where does this go". */
 export const TOP_LEVEL = new Set([
-  "AGENTS.md", "README.md", "VERSION", "LICENSE", "VERIFY-BEFORE-USE.md",
+  "AGENTS.md", "README.md", "SECURITY.md", "VERSION", "LICENSE", "VERIFY-BEFORE-USE.md",
   "package.json", "package-lock.json", ".nvmrc", ".gitignore", ".gitattributes",
   "tsconfig.json", "eslint.config.js", "app-dev.manifest.json",
   ".codex", ".agents", ".github", "docs", "standards", "governance",
