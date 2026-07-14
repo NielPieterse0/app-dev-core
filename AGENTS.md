@@ -3,6 +3,11 @@
 Reusable development method: archetypes, generator, schemas, enforcement.
 No product source. No product migrations.
 
+## Start here
+
+**Activate** `C:/Users/piete/.codex/.agents/skills/token-wize/SKILL.md` **When** at the very start of a chat and always in context **before** reading files, repo discovery
+**Activate** `.agents/skills/work-protocol/SKILL.md` **When** when implementing ANY repo change **before** discovvery and planning
+
 ## Rules live in one place
 
 `governance/rules.ts` is the **single source of truth** for the rules this repository compiles.

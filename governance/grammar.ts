@@ -3,7 +3,7 @@ export const TOP_LEVEL = new Set([
   "AGENTS.md", "README.md", "SECURITY.md", "VERSION", "LICENSE", "VERIFY-BEFORE-USE.md",
   "package.json", "package-lock.json", ".nvmrc", ".gitignore", ".gitattributes",
   "tsconfig.json", "eslint.config.js", "app-dev.manifest.json",
-  ".codex", ".agents", ".github", "docs", "standards", "governance",
+  ".codex", ".agents", ".github", ".write", "docs", "standards", "governance",
   "archetypes", "capabilities", "core", "schemas", "scripts", "tests",
   ".git", "node_modules",
 ]);

@@ -14,6 +14,7 @@ const skipDirectories = new Set([
   "coverage",
   "playwright-report",
   "test-results",
+  ".write",
   ".work",
 ]);
 

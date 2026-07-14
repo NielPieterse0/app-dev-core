@@ -5,7 +5,7 @@ type State = "passed" | "failed" | "missing";
 type Result = { rule: string; state: State; detail?: string };
 
 const root = process.cwd();
-const skip = new Set([".git", "node_modules", "dist", "coverage", "playwright-report", "test-results", ".work"]);
+const skip = new Set([".git", "node_modules", "dist", "coverage", "playwright-report", "test-results", ".write", ".work"]);
 
 const topLevelEntries = new Set([
   ".agents",

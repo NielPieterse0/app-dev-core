@@ -1,0 +1,4 @@
+interface:
+  display_name: "Work Protocol"
+  short_description: "Run the core repo workflow correctly"
+  default_prompt: "Use $work-protocol to classify, verify, and close out this app-dev-core change."

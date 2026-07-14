@@ -269,6 +269,7 @@ Every slot exists in every product from day one. **Empty is a valid state. Absen
 │
 ├── .codex/                    # config.toml · rules/ · hooks/    → permissions, this repo only
 ├── .agents/skills/            # Task workflows. Progressive disclosure. Vendored, not linked.
+├── .write/                    # Ephemeral agent scratch. Gitignored. Never committed.
 ├── .github/workflows/         # ROOT-LEVEL ONLY. Nested paths are invisible to Actions.
 │
 ├── src/
@@ -322,14 +323,14 @@ projects/          ← a product does not contain products
 nested .github/workflows/ below the repository root
 ```
 
-Ephemeral agent output goes to `.work/` — **gitignored**, never committed. Historical value lives in Git history and release tags, not on the default branch.
+Ephemeral agent output goes to `.write/` — **gitignored**, never committed. Historical value lives in Git history and release tags, not on the default branch.
 
 ### 4.3 Core grammar [C]
 
 ```text
 app-dev-core/
 ├── AGENTS.md · README.md · VERSION
-├── .codex/ · .agents/skills/ · .github/workflows/
+├── .codex/ · .agents/skills/ · .github/workflows/ · .write/
 ├── docs/
 │   ├── operating-model/       # this document
 │   └── decisions/             # core ADRs
@@ -371,7 +372,12 @@ Core MUST NOT contain: product source, product migrations, product feature specs
 | Authorization policy | Postgres RLS + the negative-case test suite | R13 |
 | Module dependency rules | ESLint boundary config | R25 |
 | Risk profile | `app-dev.manifest.json` → control matrix §12 | CI |
-| Architectural decisions | `docs/decisions/` ADRs | — |
+| Architectural decisions | `docs/decisions/` ADRs | REVIEW — trigger below |
+
+An ADR is required when the decision changes Tier A or Tier B principles, changes the
+major OM version, or promotes a product-proven pattern into a shared core surface under
+§14.2. Direct and planned changes keep their record in the PR body unless they also
+cross one of those boundaries.
 | Live deviations | `docs/deviations.md` | R26 — expiry check |
 | Published core changes | `core/releases.json` (append-only) | R39 |
 | Core PR lane (correction/proposal, origin) | The PR itself | R40 |

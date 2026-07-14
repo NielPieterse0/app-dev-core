@@ -62,7 +62,7 @@ describe("generateArchetype", () => {
         archetype: "react-vite-capacitor",
         packageName: "illegal-target",
         repoRoot,
-        targetDir: join(repoRoot, ".work", "illegal-target"),
+        targetDir: join(repoRoot, ".write", "illegal-target"),
       })
     ).toThrow(/external to the core repository/i);
   });

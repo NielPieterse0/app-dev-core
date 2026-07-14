@@ -7,6 +7,7 @@ const SKIP = new Set([
   "node_modules",
   "dist",
   "coverage",
+  ".write",
   "playwright-report",
   "test-results",
   ".work",

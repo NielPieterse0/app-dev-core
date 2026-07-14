@@ -90,7 +90,7 @@ product's own `docs/deviations.md` is the one case `release:check` treats as fai
 
 ### 7.3 Core PR fields — feedback lanes
 
-Added to `app-dev-core`'s PR template, alongside the existing conformance line:
+Present in `app-dev-core`'s generated PR template, alongside the existing conformance line:
 
 ```
 Origin: core | product:<name>
