@@ -322,14 +322,14 @@ projects/          ← a product does not contain products
 nested .github/workflows/ below the repository root
 ```
 
-Ephemeral agent output goes to `.write/` — **gitignored**, never committed. Historical value lives in Git history and release tags, not on the default branch.
+Ephemeral agent output goes to `.work/` — **gitignored**, never committed. Historical value lives in Git history and release tags, not on the default branch.
 
 ### 4.3 Core grammar [C]
 
 ```text
 app-dev-core/
 ├── AGENTS.md · README.md · VERSION
-├── .codex/ · .agents/skills/ · .github/workflows/ · .write/
+├── .codex/ · .agents/skills/ · .github/workflows/
 ├── docs/
 │   ├── operating-model/       # this document
 │   └── decisions/             # core ADRs
