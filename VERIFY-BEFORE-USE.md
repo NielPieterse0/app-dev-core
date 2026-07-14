@@ -40,7 +40,7 @@ and that applies to this kit as much as to anything it governs [R07].
 git init && git add -A && git commit -m "chore: bootstrap app-dev-core"
 npm ci
 npx tsc --noEmit             # then try the fail: [] experiment above
-npm run verify               # drift gate + registry + fixtures
+npm run verify               # drift gate + registry + fixtures + generator + clean-room archetype
 gh repo create app-dev-core --private --source=. --push
 # branch protection + required check `verify`
 # open a trivial PR; confirm check-runs dispatched > 0
