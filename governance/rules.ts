@@ -1,8 +1,8 @@
 /**
- * THE RULE REGISTRY — the single source of truth for every enforceable rule.
+ * THE RULE REGISTRY — the single source of truth for the rules compiled here.
  *
- * Nothing else in this repository states a rule. The OM's §15 table, AGENTS.md, the
- * hook deny-lists, the PR template checkboxes and the ESLint boundaries are all
+ * Nothing else in this repository states these compiled rules. The generated
+ * enforcement register, AGENTS-facing references, hook deny-lists and PR template are all
  * COMPILED from this file (`npm run governance:compile`). CI regenerates them and
  * fails on any diff, so a hand-edited copy cannot survive a merge.
  *
@@ -41,7 +41,9 @@ export const GOOD: Repo = {
   ".github/workflows/verify.yml": "name: verify\non: [push]\njobs:\n  v:\n    steps:\n      - with:\n          node-version-file: .nvmrc\n",
   ".codex/config.toml": 'default_permissions = "app-dev-core"\n\n[permissions.app-dev-core.filesystem.":workspace_roots"]\n"." = "write"\n',
   "capabilities/.gitkeep": "",
+  "core/releases.json": "[]\n",
   "docs/operating-model/operating-model.md": "Tooling MUST be Node.\n",
+  "schemas/app-dev.manifest.schema.json": '{"required":["schemaVersion","product","baseline","riskProfile"],"properties":{"baseline":{"required":["core","operatingModel","archetype"]}}}\n',
   "standards/development.md": "# standard\n",
   "scripts/verify-core.ts": "export {};\n",
 };
@@ -259,6 +261,96 @@ export const RULES: Rule[] = [
       pass: { name: "no empty failing-fixture list", repo: GOOD },
       fail: [withFile("empty failing fixture list", "governance/rules.ts", "fixtures: { pass: GOOD, " + "fail: [" + "] }")],
     },
+  },
+  {
+    id: "R37", section: "3.8", class: "CI", scope: "core",
+    statement: "The product manifest schema keeps the baseline contract honest: core, operatingModel and archetype stay required.",
+    defect: "The OM added the upgrade contract, but the core registry never checked that the shipped manifest schema still required the baseline surfaces products depend on.",
+    check: (r) => {
+      const raw = r["schemas/app-dev.manifest.schema.json"];
+      if (raw === undefined) return missing("schemas/app-dev.manifest.schema.json absent");
+      let schema: unknown;
+      try { schema = JSON.parse(raw); } catch { return fail("schemas/app-dev.manifest.schema.json is not valid JSON."); }
+      const rootRequired = Array.isArray((schema as { required?: unknown[] }).required)
+        ? (schema as { required: unknown[] }).required
+        : [];
+      const baselineRequired = Array.isArray((schema as { properties?: { baseline?: { required?: unknown[] } } }).properties?.baseline?.required)
+        ? (schema as { properties: { baseline: { required: unknown[] } } }).properties.baseline.required
+        : [];
+      const needsRoot = ["baseline", "riskProfile"];
+      const needsBaseline = ["core", "operatingModel", "archetype"];
+      const missingRoot = needsRoot.filter((k) => !rootRequired.includes(k));
+      const missingBaseline = needsBaseline.filter((k) => !baselineRequired.includes(k));
+      return missingRoot.length || missingBaseline.length
+        ? fail(
+            `Manifest schema lost required baseline fields: ` +
+            `${missingRoot.length ? `root missing ${missingRoot.join(", ")}` : ""}` +
+            `${missingRoot.length && missingBaseline.length ? "; " : ""}` +
+            `${missingBaseline.length ? `baseline missing ${missingBaseline.join(", ")}` : ""}`
+          )
+        : pass;
+    },
+    fixtures: {
+      pass: { name: "baseline contract retained", repo: GOOD },
+      fail: [
+        withFile(
+          "baseline omits operatingModel",
+          "schemas/app-dev.manifest.schema.json",
+          '{"required":["schemaVersion","product","baseline","riskProfile"],"properties":{"baseline":{"required":["core","archetype"]}}}'
+        ),
+      ],
+    },
+  },
+  {
+    id: "R38", section: "3.8", class: "REVIEW", scope: "core",
+    statement: "Port-interface changes require a §13 deviation; risk profile is reviewed at each gated change instead of freezing at product creation.",
+    defect: "The OM added the upgrade contract's port-surface stability rule, but this judgment-call rule was never registered with the rest of the core governance set.",
+  },
+  {
+    id: "R39", section: "3.8", class: "CI", scope: "core",
+    statement: "Published core changes live in append-only core/releases.json entries with a valid category and minimum release metadata.",
+    defect: "The OM added the publishing ledger surface, but the core registry never checked that core/releases.json existed or preserved the contract products will consume.",
+    check: (r) => {
+      const raw = r["core/releases.json"];
+      if (raw === undefined) return missing("core/releases.json absent");
+      let entries: unknown;
+      try { entries = JSON.parse(raw); } catch { return fail("core/releases.json is not valid JSON."); }
+      if (!Array.isArray(entries)) return fail("core/releases.json must be a JSON array.");
+      const allowed = new Set(["security", "recommended", "optional"]);
+      for (const [idx, entry] of entries.entries()) {
+        if (typeof entry !== "object" || entry === null) return fail(`core/releases.json[${idx}] is not an object.`);
+        const e = entry as {
+          version?: unknown;
+          date?: unknown;
+          category?: unknown;
+          affects?: { kind?: unknown; name?: unknown; version?: unknown };
+          summary?: unknown;
+        };
+        if (typeof e.version !== "string" || !/^\d+\.\d+\.\d+/.test(e.version)) return fail(`core/releases.json[${idx}] has an invalid version.`);
+        if (typeof e.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return fail(`core/releases.json[${idx}] has an invalid date.`);
+        if (typeof e.category !== "string" || !allowed.has(e.category)) return fail(`core/releases.json[${idx}] has an invalid category.`);
+        if (typeof e.summary !== "string" || e.summary.trim().length === 0) return fail(`core/releases.json[${idx}] is missing summary.`);
+        if (typeof e.affects?.kind !== "string" || typeof e.affects?.name !== "string" || typeof e.affects?.version !== "string") {
+          return fail(`core/releases.json[${idx}] is missing affects metadata.`);
+        }
+      }
+      return pass;
+    },
+    fixtures: {
+      pass: { name: "empty publishing ledger is valid", repo: GOOD },
+      fail: [
+        withFile(
+          "invalid release category",
+          "core/releases.json",
+          '[{"version":"1.1.0","date":"2026-08-01","category":"urgent","affects":{"kind":"archetype","name":"react-vite-capacitor","version":"1.1.0"},"summary":"x"}]'
+        ),
+      ],
+    },
+  },
+  {
+    id: "R40", section: "3.8", class: "REVIEW", scope: "core",
+    statement: "Every core PR states Origin and Type; a proposal touching capabilities cites two consuming products or is redirected to §14.",
+    defect: "The OM added the correction-versus-proposal feedback lane, but the required PR metadata was never registered alongside the rest of the core rules.",
   },
   {
     id: "B1", section: "14", class: "CI", scope: "core",

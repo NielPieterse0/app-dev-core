@@ -4,7 +4,7 @@ export const TOP_LEVEL = new Set([
   "package.json", "package-lock.json", ".nvmrc", ".gitignore", ".gitattributes",
   "tsconfig.json", "eslint.config.js", "app-dev.manifest.json",
   ".codex", ".agents", ".github", "docs", "standards", "governance",
-  "archetypes", "capabilities", "schemas", "scripts", "tests",
+  "archetypes", "capabilities", "core", "schemas", "scripts", "tests",
   ".git", "node_modules",
 ]);
 

@@ -230,8 +230,8 @@ every mechanism here produces a patch or a PR, never an overwrite.
 
 **Publishing (core → product): pull, never push.** §3.3 already forbids the core
 writing to a product; publishing can only mean making something discoverable, via
-an append-only `core/releases.json` and a read-only `scripts/check-updates.ts`
-(product-side). The one thing that can't be optional is the decision: a
+an append-only `core/releases.json` and, once a product actually consumes upgrades,
+a read-only `scripts/check-updates.ts` (product-side). The one thing that can't be optional is the decision: a
 `security`-category entry with no adoption and no §13 deviation fails
 `release:check`; `recommended`/`optional` entries are visible and never block.
 *(CI — R39. Cheap enough to build now — no B1 threshold, no second product
@@ -341,7 +341,7 @@ app-dev-core/
 │   └── node-service/          # slot — empty (§14)
 ├── capabilities/              # slot — EMPTY DIRECTORY (§14, B1: two products first)
 ├── schemas/                   # manifest.schema.json
-├── scripts/                   # Node/TS: generate · verify-core · test-archetype · audit-product
+├── scripts/                   # Node/TS: generate · verify-core · test-archetype · future audit-product
 └── tests/
     ├── generator/             # pass AND fail fixtures
     ├── archetype/             # clean-room generation
@@ -498,7 +498,8 @@ npm run verify          # everything that must be green to merge
 npm run release:check   # everything that must be green to release
 ```
 
-Core additionally: `verify-core`, `test-generator`, `test-archetype`, `audit-product`. *(CI — R21)*
+Core additionally: `verify-core`, `test-generator`, `test-archetype`; `audit-product`
+lands only when its §14 trigger fires. *(CI — R21)*
 
 A third product-level entry point requires deleting one (§2.9).
 
@@ -822,7 +823,7 @@ Temporary deviations expire. A deviation does not amend this document. No produc
 | R36 | Supabase auth uses `flowType: 'pkce'` and the `KeyValueStore` port, never `localStorage` directly | 6.7 | CI | Client-init assertion test |
 | R37 | Provenance manifest baseline never silently drifts from what's actually running | 3.8 | CI | Manifest-vs-lockfile cross-check |
 | R38 | Port-interface changes require a §13 deviation; risk profile kept current at every gated change, not fixed at creation | 3.8 | REVIEW | PR review at gated-change time |
-| R39 | A `security`-category `core/releases.json` entry with no adoption and no §13 deviation fails `release:check` | 3.8 | CI | `scripts/check-updates.ts` |
+| R39 | A `security`-category `core/releases.json` entry with no adoption and no §13 deviation fails `release:check` | 3.8 | CI | `core/releases.json` now; `scripts/check-updates.ts` when the product-side upgrade surface lands |
 | R40 | Every core PR states Origin and Type; a `proposal` touching `capabilities/` cites two consuming products or redirects to §14 | 3.8 | REVIEW | PR template required fields |
 
 **REVIEW count: 10.** Raised once from 8, named, in the open — see §2.9. A rule requiring further REVIEW capacity is promoted to CI or the count is not raised again without an equally named defect.

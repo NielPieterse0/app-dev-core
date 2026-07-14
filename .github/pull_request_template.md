@@ -9,6 +9,8 @@
 
 **Class:** direct | planned | gated · **Compatibility:** patch | minor | major
 
+**Origin:** core | product:<name> · **Type:** correction | proposal
+
 **Problem:**
 
 **Acceptance condition:**
@@ -21,7 +23,7 @@
 
 ## Machine-checked for you
 
-These 14 rules are enforced by `npm run verify`. You do not need to confirm them.
+These 16 rules are enforced by `npm run verify`. You do not need to confirm them.
 If CI is green, they hold. If you are tempted to tick them by hand, that is the defect.
 
 - `R02` No sibling-path (`../../`) dependency in build, test, CI, deploy or release.
@@ -37,6 +39,8 @@ If CI is green, they hold. If you are tempted to tick them by hand, that is the 
 - `R22` The declared Codex permission profile exists. Documentation never restates it.
 - `R24` No artifact outside the directory grammar. A new artifact type requires a grammar amendment first.
 - `R23` Every CI rule has a passing fixture and at least one failing fixture.
+- `R37` The product manifest schema keeps the baseline contract honest: core, operatingModel and archetype stay required.
+- `R39` Published core changes live in append-only core/releases.json entries with a valid category and minimum release metadata.
 - `B1` capabilities/ stays empty until two products independently prove a need.
 
 ## Rollback
