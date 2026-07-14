@@ -4,6 +4,20 @@
   "private": true,
   "description": "Development control plane: archetypes, generator, schemas, enforcement.",
   "license": "Apache-2.0",
+  "author": "Niel Pieterse",
+  "homepage": "https://github.com/NielPieterse0/app-dev-core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NielPieterse0/app-dev-core.git"
+  },
+  "keywords": [
+    "app-dev-core",
+    "archetypes",
+    "developer-tooling",
+    "generator",
+    "governance",
+    "typescript"
+  ],
   "type": "module",
   "engines": {
     "node": ">=22 <23"
