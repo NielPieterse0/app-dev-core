@@ -1,9 +1,20 @@
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import {
+  evaluateBranchProtection,
+  evaluateDependabotConfig,
+  evaluateHostedChecks,
+  evaluateSecurityAnalysis,
+  evaluateWorkflowPermissions,
+  type BranchProtectionPayload,
+  type CheckRunsPayload,
+  type ReleaseCheckResult,
+  type RepoMetadataPayload,
+  type State,
+  type WorkflowPermissionsPayload,
+} from "./lib/release-check.js";
 
-type State = "passed" | "failed" | "not-applicable" | "not-run";
-
-const results: { rule: string; state: State; detail?: string }[] = [];
+const results: ReleaseCheckResult[] = [];
 
 const structure = spawnSync("node", ["./node_modules/tsx/dist/cli.mjs", "./scripts/verify-structure.ts"], {
   stdio: "pipe",
@@ -12,9 +23,9 @@ const structure = spawnSync("node", ["./node_modules/tsx/dist/cli.mjs", "./scrip
 
 results.push(
   structure.status === 0
-    ? { rule: "R12/structure", state: "passed" }
+    ? { rule: "LOCAL/structure", state: "passed" }
     : {
-        rule: "R12/structure",
+        rule: "LOCAL/structure",
         state: "failed",
         detail: "verify-structure failed. Run npm run verify first.",
       }
@@ -72,11 +83,17 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const protection = spawnSync("gh", ["api", `repos/${slug}/branches/${defaultBranch}/protection`], {
+  const branchProtection = spawnSync("gh", ["api", `repos/${slug}/branches/${defaultBranch}/protection`], {
     encoding: "utf8",
   });
 
-  if (protection.status !== 0) {
+  results.push(
+    evaluateDependabotConfig(
+      existsSync(".github/dependabot.yml") ? readFileSync(".github/dependabot.yml", "utf8") : null
+    )
+  );
+
+  if (branchProtection.status !== 0) {
     return {
       rule: "R08",
       state: "failed",
@@ -84,26 +101,32 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const protectionInfo = JSON.parse(protection.stdout) as {
-    required_status_checks?: {
-      contexts?: string[];
-      checks?: Array<{ context?: string }>;
-    };
-  };
+  results.push(
+    evaluateBranchProtection(JSON.parse(branchProtection.stdout) as BranchProtectionPayload)
+  );
 
-  const requiredChecks = new Set([
-    ...(protectionInfo.required_status_checks?.contexts ?? []),
-    ...(protectionInfo.required_status_checks?.checks ?? []).flatMap((entry) =>
-      entry.context ? [entry.context] : []
-    ),
-  ]);
+  const workflowPermissions = spawnSync("gh", ["api", `repos/${slug}/actions/permissions/workflow`], {
+    encoding: "utf8",
+  });
 
-  if (!requiredChecks.has("verify")) {
+  if (workflowPermissions.status !== 0) {
     return {
       rule: "R08",
       state: "failed",
-      detail: `${defaultBranch} branch protection does not require the verify check.`,
+      detail: "Unable to read repository workflow permissions.",
     };
+  }
+
+  results.push(
+    evaluateWorkflowPermissions(JSON.parse(workflowPermissions.stdout) as WorkflowPermissionsPayload)
+  );
+
+  const repoMetadata = spawnSync("gh", ["api", `repos/${slug}`], {
+    encoding: "utf8",
+  });
+
+  if (repoMetadata.status === 0) {
+    results.push(...evaluateSecurityAnalysis(JSON.parse(repoMetadata.stdout) as RepoMetadataPayload));
   }
 
   const headSha = spawnSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" });
@@ -129,48 +152,7 @@ function ghResult(): { rule: string; state: State; detail?: string } {
     };
   }
 
-  const checkRunInfo = JSON.parse(checkRuns.stdout) as {
-    total_count?: number;
-    check_runs?: Array<{
-      name?: string;
-      status?: string;
-      conclusion?: string | null;
-    }>;
-  };
-
-  if ((checkRunInfo.total_count ?? 0) === 0) {
-    return {
-      rule: "R08",
-      state: "failed",
-      detail: "Hosted check-runs total_count is 0 for the current HEAD commit.",
-    };
-  }
-
-  const verifyRuns = (checkRunInfo.check_runs ?? []).filter((run) => run.name === "verify");
-
-  if (verifyRuns.length === 0) {
-    return {
-      rule: "R08",
-      state: "failed",
-      detail: "No hosted verify check-run was found for the current HEAD commit.",
-    };
-  }
-
-  const blockingVerifyRun = verifyRuns.find(
-    (run) => run.status !== "completed" || run.conclusion !== "success"
-  );
-
-  return blockingVerifyRun
-    ? {
-        rule: "R08",
-        state: "failed",
-        detail: `Hosted verify for the current HEAD is ${blockingVerifyRun.status}/${blockingVerifyRun.conclusion ?? "pending"}.`,
-      }
-    : {
-        rule: "R08",
-        state: "passed",
-        detail: `Hosted verify is green for ${sha.slice(0, 7)} and required on ${defaultBranch}.`,
-      };
+  return evaluateHostedChecks(JSON.parse(checkRuns.stdout) as CheckRunsPayload);
 }
 
 results.push(ghResult());

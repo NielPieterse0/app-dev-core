@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { validateItem, type Item } from "@/domain/Item.js";
 import type { ItemRepository } from "@/data/ports/ItemRepository.js";
 
-export function useItems(repository: ItemRepository) {
+export type ItemsRepository = ItemRepository;
+
+export function useItems(repository: ItemsRepository) {
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState<string | null>(null);
 

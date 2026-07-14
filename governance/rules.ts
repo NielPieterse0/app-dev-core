@@ -14,7 +14,7 @@ import { pass, fail, missing, paths } from "./types.js";
 import { TOP_LEVEL, NO_SLOT_PATTERNS } from "./grammar.js";
 
 const SHELL = /\.(ps1|psm1|psd1|sh|bat|cmd)$/i;
-const ABS = /(^|["'\s=(])([A-Za-z]:\\|\/(Users|home)\/)/;
+const ABS = /(^|["'\s=(])([A-Za-z]:\\|\/(Users|home|mnt|opt|root|tmp|var)\/)/;
 const FLOATING = /["']?node-version["']?\s*:\s*["']?(latest|lts\/\*)/i;
 const NORMATIVE = /\b(MUST NOT|MUST|SHALL|PROHIBITED|FORBIDDEN)\b/;
 
@@ -154,7 +154,10 @@ export const RULES: Rule[] = [
     },
     fixtures: {
       pass: { name: "relative only", repo: GOOD },
-      fail: [withFile("windows abs path", "scripts/x.ts", 'const p = "C:\\\\Projects\\\\app-dev";')],
+      fail: [
+        withFile("windows abs path", "scripts/x.ts", 'const p = "C:\\\\Projects\\\\app-dev";'),
+        withFile("unix abs path", "README.md", "Path: /var/tmp/example\n"),
+      ],
     },
   },
   {

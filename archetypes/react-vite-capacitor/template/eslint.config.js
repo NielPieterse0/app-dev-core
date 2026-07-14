@@ -3,6 +3,8 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
+const restrictedImportRule = (patterns) => ["error", { patterns }];
+
 const capacitorRestriction = {
   paths: [
     {
@@ -19,6 +21,59 @@ const capacitorRestriction = {
     },
   ],
 };
+
+const browserGlobalsRestriction = [
+  "error",
+  {
+    name: "window",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    name: "document",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    name: "navigator",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    name: "localStorage",
+    message: "Browser storage belongs behind the KeyValueStore port in src/platform/**.",
+  },
+  {
+    name: "sessionStorage",
+    message: "Browser storage belongs behind the KeyValueStore port in src/platform/**.",
+  },
+];
+
+const globalThisBrowserRestrictions = [
+  "error",
+  {
+    object: "globalThis",
+    property: "window",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    object: "globalThis",
+    property: "document",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    object: "globalThis",
+    property: "navigator",
+    message: "Browser globals belong in src/platform/**.",
+  },
+  {
+    object: "globalThis",
+    property: "localStorage",
+    message: "Browser storage belongs behind the KeyValueStore port in src/platform/**.",
+  },
+  {
+    object: "globalThis",
+    property: "sessionStorage",
+    message: "Browser storage belongs behind the KeyValueStore port in src/platform/**.",
+  },
+];
 
 export default tseslint.config(
   {
@@ -49,6 +104,69 @@ export default tseslint.config(
     },
   },
   {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/platform/**/*.{ts,tsx}", "src/main.tsx"],
+    rules: {
+      "no-restricted-globals": browserGlobalsRestriction,
+      "no-restricted-properties": globalThisBrowserRestrictions,
+    },
+  },
+  {
+    files: ["src/domain/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: ["**/data/**", "**/features/**", "**/ui/**", "**/platform/**"],
+          message: "domain stays pure. Keep dependencies flowing inward only.",
+        },
+      ]),
+    },
+  },
+  {
+    files: ["src/data/ports/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: ["**/data/adapters/**", "**/features/**", "**/ui/**", "**/platform/**"],
+          message: "data/ports define contracts only. They must not reach outward.",
+        },
+      ]),
+    },
+  },
+  {
+    files: ["src/data/adapters/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: ["**/features/**", "**/ui/**", "**/platform/**"],
+          message: "Concrete adapters belong below features and ui, never above them.",
+        },
+      ]),
+    },
+  },
+  {
+    files: ["src/features/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: ["**/data/adapters/**", "**/ui/**", "**/platform/**"],
+          message: "features may depend on domain and ports only.",
+        },
+      ]),
+    },
+  },
+  {
+    files: ["src/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: ["**/data/**", "**/platform/**"],
+          message: "ui stays platform-free and consumes features or domain types only.",
+        },
+      ]),
+    },
+  },
+  {
     files: ["src/platform/**/*.{ts,tsx}"],
     languageOptions: {
       globals: {
@@ -66,6 +184,26 @@ export default tseslint.config(
     },
     rules: {
       "no-restricted-imports": "off",
+    },
+  },
+  {
+    files: ["src/platform/web/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": restrictedImportRule([
+        {
+          group: [
+            "**/platform/native/**",
+            "**/platform/ios/**",
+            "**/platform/android/**",
+            "**/platform/desktop/**",
+            "@/platform/native/**",
+            "@/platform/ios/**",
+            "@/platform/android/**",
+            "@/platform/desktop/**",
+          ],
+          message: "Platform implementations bind only at src/platform/composition.ts.",
+        },
+      ]),
     },
   },
   {

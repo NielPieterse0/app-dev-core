@@ -1,9 +1,8 @@
 import { useState } from "react";
-import type { ItemRepository } from "@/data/ports/ItemRepository.js";
-import { useItems } from "@/features/items/useItems.js";
+import { useItems, type ItemsRepository } from "@/features/items/useItems.js";
 
 type ItemsViewProps = {
-  repo: ItemRepository;
+  repo: ItemsRepository;
 };
 
 export function ItemsView({ repo }: ItemsViewProps) {

@@ -307,6 +307,7 @@ Every slot exists in every product from day one. **Empty is a valid state. Absen
 ├── specs/                     # GATED CHANGES ONLY. Nothing else earns a durable spec.
 └── docs/
     ├── product.md             # What it is, who for, scope, exclusions
+    ├── operating-model-reference.md # Product-local reading copy. Never authority.
     ├── decisions/             # ADRs. Durable. Numbered. Never deleted.
     ├── runbook.md             # Operate, deploy, roll back
     └── deviations.md          # Live §13 deviations with expiries
@@ -825,7 +826,7 @@ Temporary deviations expire. A deviation does not amend this document. No produc
 | R32 | Completion states never conflated | 11.1 | REVIEW | PR review |
 | **R33** | **Nothing outside `src/platform/**` references `window`, `document`, `localStorage`, `sessionStorage`, `navigator`, or `Capacitor`** | **6.6** | **CI** | **ESLint `no-restricted-globals` + `no-restricted-imports`. Failing fixture: a `features/` module importing `localStorage`** |
 | R34 | All six capability ports declared; every adapter either works or **throws** — never silently returns `undefined` | 6.5, 6.8 | CI | Port enumeration test + adapter conformance suite (R27 applies) |
-| R35 | Safe-area insets, `viewport-fit=cover`, `100dvh`, ≥44px touch targets | 6.7 | CI | Stylelint + E2E responsive assertion |
+| R35 | Safe-area insets, `viewport-fit=cover`, `100dvh`, ≥44px touch targets | 6.7 | CI | Structure check + E2E responsive assertion |
 | R36 | Supabase auth uses `flowType: 'pkce'` and the `KeyValueStore` port, never `localStorage` directly | 6.7 | CI | Client-init assertion test |
 | R37 | Provenance manifest baseline never silently drifts from what's actually running | 3.8 | CI | Manifest-vs-lockfile cross-check |
 | R38 | Port-interface changes require a §13 deviation; risk profile kept current at every gated change, not fixed at creation | 3.8 | REVIEW | PR review at gated-change time |
