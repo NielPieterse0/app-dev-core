@@ -11,7 +11,6 @@ Activate `.agents/skills/work-protocol/SKILL.md` before implementing repo change
 ## Rules live in one place
 
 `governance/rules.ts` is the **single source of truth** for the rules this repository compiles.
-
 Nothing else states a rule. The enforcement register, the PR template and the
 generated `.codex/hooks/` are **compiled** from it. Files carrying a `GENERATED — DO NOT EDIT`
 header are outputs; hand-editing one fails the drift gate in CI.

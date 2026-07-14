@@ -51,6 +51,8 @@ const requiredPaths = [
   "scripts/verify-structure.ts",
   "src/data/adapters/index.ts",
   "src/main.tsx",
+  "src/platform/android/README.md",
+  "src/platform/ios/README.md",
   "specs/000-product-foundation/spec.md",
   "docs/product.md",
   "docs/operating-model-reference.md",
@@ -174,7 +176,7 @@ results.push(
     : { rule: "R11-.nvmrc", state: "passed" }
 );
 
-const absolutePathPattern = /(^|["'\s=(])([A-Za-z]:\\|\/(Users|home)\/)/;
+const absolutePathPattern = /(^|["'\s=(])([A-Za-z]:\\|\/(Users|home|mnt|opt|root|tmp|var)\/)/;
 const absolutePathHits = files
   .filter((filePath) => /\.(ts|tsx|js|mjs|json|toml|ya?ml|md)$/i.test(filePath))
   .filter((filePath) => !filePath.startsWith("tests/"))
@@ -196,6 +198,32 @@ results.push(
   browserGlobalHits.length
     ? { rule: "R33", state: "failed", detail: browserGlobalHits.join(", ") }
     : { rule: "R33", state: "passed" }
+);
+
+const html = read("index.html");
+const appShellCss = read("src/ui/shell/app-shell.css");
+const r35Missing: string[] = [];
+
+if (!/viewport-fit=cover/.test(html)) {
+  r35Missing.push("index.html missing viewport-fit=cover");
+}
+
+if (!/min-height:\s*100dvh\s*;/.test(appShellCss)) {
+  r35Missing.push("src/ui/shell/app-shell.css missing 100dvh app shell height");
+}
+
+if (!/env\(safe-area-inset-(top|left|right|bottom)\)/.test(appShellCss)) {
+  r35Missing.push("src/ui/shell/app-shell.css missing safe-area inset usage");
+}
+
+if (!/min-height:\s*44px\s*;/.test(appShellCss)) {
+  r35Missing.push("src/ui/shell/app-shell.css missing 44px touch target minimum");
+}
+
+results.push(
+  r35Missing.length
+    ? { rule: "R35", state: "failed", detail: r35Missing.join("; ") }
+    : { rule: "R35", state: "passed" }
 );
 
 const repoEscapeHits: string[] = [];

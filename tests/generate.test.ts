@@ -53,6 +53,12 @@ describe("generateArchetype", () => {
     expect(config).toContain('default_permissions = "fieldnote-mobile-workspace"');
     expect(readFileSync(join(targetDir, ".github", "workflows", "verify.yml"), "utf8")).toContain("name: verify");
     expect(readFileSync(join(targetDir, "db", "migrations", ".gitkeep"), "utf8")).toMatch(/\s*/);
+    expect(readFileSync(join(targetDir, "src", "platform", "ios", "README.md"), "utf8")).toContain(
+      "empty slot"
+    );
+    expect(readFileSync(join(targetDir, "src", "platform", "android", "README.md"), "utf8")).toContain(
+      "empty slot"
+    );
     expect(readFileSync(join(targetDir, "README.md"), "utf8")).not.toMatch(/__[a-z0-9_]+__/);
   });
 
