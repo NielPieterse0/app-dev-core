@@ -12,7 +12,7 @@ const NO_SLOT = [
   /(^|\/)\.superpowers\//i,
   /(^|\/)projects\//i,
 ];
-const TOP = new Set([".agents",".codex",".git",".gitattributes",".github",".gitignore",".nvmrc","AGENTS.md","LICENSE","README.md","VERIFY-BEFORE-USE.md","VERSION","app-dev.manifest.json","archetypes","capabilities","docs","eslint.config.js","governance","node_modules","package-lock.json","package.json","schemas","scripts","standards","tests","tsconfig.json"]);
+const TOP = new Set([".agents",".codex",".git",".gitattributes",".github",".gitignore",".nvmrc","AGENTS.md","LICENSE","README.md","VERIFY-BEFORE-USE.md","VERSION","app-dev.manifest.json","archetypes","capabilities","core","docs","eslint.config.js","governance","node_modules","package-lock.json","package.json","schemas","scripts","standards","tests","tsconfig.json"]);
 const SHELL = /\.(ps1|psm1|psd1|sh|bat|cmd)$/i;
 
 function block(m) { console.error(`BLOCKED [guard-grammar]\n  ${m}`); process.exit(2); }

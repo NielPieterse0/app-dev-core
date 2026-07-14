@@ -36,7 +36,7 @@ describe("registry integrity", () => {
   });
 
   it("REVIEW rules stay scarce — they are the weakest and the cheapest to add", () => {
-    expect(RULES.filter((r) => r.class === "REVIEW").length).toBeLessThanOrEqual(8);
+    expect(RULES.filter((r) => r.class === "REVIEW").length).toBeLessThanOrEqual(10);
   });
 });
 

@@ -5,7 +5,7 @@
 A rule not listed here does not exist. This table is compiled from `governance/rules.ts`;
 editing it by hand will fail the drift check.
 
-**16 rules — 14 CI, 1 GATE, 1 REVIEW.**
+**20 rules — 16 CI, 1 GATE, 3 REVIEW.**
 
 | ID | Rule | § | Class | Scope |
 |---|---|---|---|---|
@@ -24,6 +24,10 @@ editing it by hand will fail the drift check.
 | R22 | The declared Codex permission profile exists. Documentation never restates it. | 12.3 | CI | both |
 | R24 | No artifact outside the directory grammar. A new artifact type requires a grammar amendment first. | 4 | CI | both |
 | R23 | Every CI rule has a passing fixture and at least one failing fixture. | 9.5 | CI | core |
+| R37 | The product manifest schema keeps the baseline contract honest: core, operatingModel and archetype stay required. | 3.8 | CI | core |
+| R38 | Port-interface changes require a §13 deviation; risk profile is reviewed at each gated change instead of freezing at product creation. | 3.8 | REVIEW | core |
+| R39 | Published core changes live in append-only core/releases.json entries with a valid category and minimum release metadata. | 3.8 | CI | core |
+| R40 | Every core PR states Origin and Type; a proposal touching capabilities cites two consuming products or is redirected to §14. | 3.8 | REVIEW | core |
 | B1 | capabilities/ stays empty until two products independently prove a need. | 14 | CI | core |
 
 ### Cited defects
@@ -47,4 +51,8 @@ Every rule names the defect that justifies it. No defect, no rule.
 | R22 | The README said project permissions were disabled while .codex/config.toml enabled them and granted .git write. |
 | R24 | Artifacts arrived with nowhere to go and invented homes; the same fact ended up in AGENTS, standards, commands, skills and registries. |
 | R23 | scan-secrets excluded projects/; the receipt regex missed 'pending'; the obligations script was inert on committed trees. All three passed every test they were ever given. |
+| R37 | The OM added the upgrade contract, but the core registry never checked that the shipped manifest schema still required the baseline surfaces products depend on. |
+| R38 | The OM added the upgrade contract's port-surface stability rule, but this judgment-call rule was never registered with the rest of the core governance set. |
+| R39 | The OM added the publishing ledger surface, but the core registry never checked that core/releases.json existed or preserved the contract products will consume. |
+| R40 | The OM added the correction-versus-proposal feedback lane, but the required PR metadata was never registered alongside the rest of the core rules. |
 | B1 | Two governance-hardening cycles completed before any app was produced. |

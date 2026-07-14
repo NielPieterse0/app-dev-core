@@ -33,9 +33,10 @@ thresholds, fixtures, and procedures.
 
 ## 4. Lint and module boundaries
 
-The R33 platform-isolation rule and the R25 inward-arrow rule live in the archetype's
-`eslint.config.js`, because they govern **product** code. This file records only that
-they are mandatory. See `archetypes/react-vite-capacitor/eslint.config.js`.
+The R33 platform-isolation rule and the R25 inward-arrow rule belong in the product-facing
+archetype's `eslint.config.js`, because they govern **product** code. This bootstrap repo
+does not ship that file yet; the current `react-vite-capacitor` archetype is still an
+empty slot plus its README. This section records the intended owner, not a present file.
 
 ## 5. Database procedure
 
@@ -76,6 +77,9 @@ Append-only. One entry per publish, never rewritten:
 `optional` (visible, never blocks).
 
 ### 7.2 `scripts/check-updates.ts` — product-side, read-only
+
+Deferred until the first product actually consumes the publishing ledger. The contract
+below describes the intended script surface; this bootstrap repo does not ship the file yet.
 
 Runs from a product repository (e.g. `npx github:NielPieterse0/app-dev-core#<tag>
 scripts/check-updates.ts`). Reads the product's own `app-dev.manifest.json.baseline`,
