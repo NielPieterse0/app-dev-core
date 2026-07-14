@@ -20,9 +20,10 @@ the rule was not enforced — and that is the defect, not your memory.
 ## Commands
 
 ```bash
-npm run verify               # drift gate + registry checks + fixtures. Green to merge.
+npm run verify               # drift gate + typecheck + registry checks + fixtures. Green to merge.
 npm run governance:compile   # regenerate artefacts after editing the registry
 npm run governance:check     # fail if any generated file drifted
+npm run typecheck            # prove the root repository compiles under the pinned TypeScript version
 npm run verify-core          # run every CI rule against this repository
 npm run test-enforcement     # run every rule against its own pass + fail fixtures
 ```
