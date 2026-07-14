@@ -3,6 +3,11 @@
 Reusable development method: archetypes, generator, schemas, enforcement.
 No product source. No product migrations.
 
+## Start here
+
+Activate `token-wize` at task start to keep retrieval and turns lean.
+Activate `.agents/skills/work-protocol/SKILL.md` before implementing repo changes.
+
 ## Rules live in one place
 
 `governance/rules.ts` is the **single source of truth** for every enforceable rule.
@@ -42,6 +47,7 @@ Empty = blocked merge. The three questions are defined in the OM §2.0.
 | What are the rules? | `governance/rules.ts`, and its compiled register |
 | Where does this file go? | `governance/grammar.ts`. No slot → do not create it; amend the grammar first |
 | Is this rule real? | If it is not in the registry, it does not exist |
+| How should I work this change? | `.agents/skills/work-protocol/SKILL.md` |
 | Should I build this now? | The OM §14 deferral register. Trigger not fired → no |
 | What is proven vs unverified? | `VERIFY-BEFORE-USE.md` |
 | Which tools and versions? | `standards/development.md` |
